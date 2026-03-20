@@ -38,11 +38,11 @@ export function Hero() {
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-sans font-bold text-foreground leading-tight text-balance">
           <span className="text-primary">[</span>Yaseen Khalil<span className="text-primary">]</span>
           <span className="text-muted-foreground mx-3">|</span>
-          <span className="block md:inline">Systems Architect &amp; Quantitative Modeler</span>
+          <span className="block md:inline">Computational Modeler &amp; ML Systems Architect</span>
         </h1>
-        
         <p className="mt-6 md:mt-8 font-mono text-sm md:text-base text-muted-foreground max-w-3xl leading-relaxed">
-          <span className="text-primary">{'>'}</span> Specializing in advanced statistical dynamics, AI agent gateways, and high-dimensional state modeling.
+          <span className="text-primary">{'>'}</span> Exploring the mathematical architecture of intelligent systems. Bridging high-dimensional feature engineering with production data pipelines and autonomous AI integrations.
+
         </p>
       </div>
     </section>

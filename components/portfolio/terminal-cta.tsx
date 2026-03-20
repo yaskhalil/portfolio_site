@@ -53,7 +53,7 @@ export function TerminalCTA() {
             
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 pl-0 md:pl-0 pt-2">
               <a 
-                href="mailto:your.email@example.com"
+                href="mailto:yaskhalil2006@gmail.com"
                 className="inline-flex items-center gap-3 font-mono text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
                 <Mail className="w-4 h-4" />
