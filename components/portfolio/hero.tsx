@@ -1,11 +1,14 @@
 "use client"
 
+import Link from "next/link"
 import { AsciiMesh } from "./ascii-mesh"
+
+const MESH_CODE_HREF = "https://github.com/yaskhalil/portfolio_site/blob/main/components/portfolio/ascii-mesh.tsx"
 
 export function Hero() {
   return (
     <section className="relative">
-      {/* ASCII mesh - inspired by p5js-ascii-renderer, cycles every 5s with morph transition */}
+      {/* ASCII mesh — morph cycle ~17.5s */}
       <div 
         className="w-full h-[60vh] md:h-[70vh] bg-secondary/30 border border-border relative overflow-hidden"
         aria-label="ASCII mesh visualization"
@@ -29,7 +32,18 @@ export function Hero() {
           <span className="text-primary">//</span> ascii.mesh
         </div>
         <div className="absolute bottom-4 right-4 font-mono text-xs text-muted-foreground z-10">
-          <span className="text-primary">render</span>_cycle: 5s
+          <span className="text-primary">render</span>_cycle: 17.5s
+        </div>
+        <div className="absolute bottom-4 left-4 z-10">
+          <Link
+            href={MESH_CODE_HREF}
+            className="font-mono text-xs text-muted-foreground hover:text-primary underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-colors"
+            {...(MESH_CODE_HREF.startsWith("http")
+              ? { target: "_blank" as const, rel: "noopener noreferrer" }
+              : {})}
+          >
+            <span className="text-primary">{'//'}</span> code for the mesh
+          </Link>
         </div>
       </div>
 
