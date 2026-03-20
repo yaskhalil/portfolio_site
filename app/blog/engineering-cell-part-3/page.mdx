@@ -1,0 +1,83 @@
+export const metadata = {
+  title: "Turning Cells into Matrices | Engineering a Cell",
+  description: "Semi-Tensor Product, Boolean control networks, and prescriptive perturbation.",
+}
+
+<section className="px-6 md:px-12 lg:px-20 py-20 md:py-28 border-t border-border">
+  <div className="mb-10 md:mb-14">
+    <div className="font-mono text-xs text-muted-foreground mb-2">
+      <span className="text-primary">$</span> cat blog/engineering-cell-part-3
+    </div>
+    <h1 className="text-2xl md:text-3xl font-sans font-bold text-foreground">
+      Turning Cells into Matrices
+    </h1>
+    <p className="mt-3 font-mono text-sm text-muted-foreground">
+      Part 3 of Engineering a Cell · 2026-03-20
+    </p>
+  </div>
+
+  <article className="max-w-4xl space-y-8 font-mono">
+    <section className="space-y-4">
+      <h3 className="font-sans text-lg font-semibold text-foreground">
+        Turning Cells into Matrices
+      </h3>
+      <p className="text-sm text-foreground leading-relaxed">
+        The final step was figuring out how to mathematically force the cell out of the aggressive Mesenchymal state.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        This is where Boolean networks hit a wall. Logic gates (AND, OR, NOT) and IF/THEN rules are great for programming a simulation, but they are terrible for control theory. You can't easily do calculus or calculate optimal control paths on a bunch of discrete logic gates. I needed a way to translate those Boolean rules into standard linear algebra.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        Enter the Semi-Tensor Product (STP).
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        Standard matrix multiplication requires the inner dimensions to match. STP throws that constraint out the window, allowing you to multiply matrices of arbitrary dimensions. By applying STP to the Boolean logic tables, I converted the entire network's ruleset into a massive, algebraic state-space representation.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        Suddenly, the messy biological network was reduced to a clean, discrete linear system defined by a global structure matrix, L:
+      </p>
+      <p className="text-sm text-primary font-medium">
+        x(t+1) = L ⋉ x(t)
+      </p>
+    </section>
+
+    <section className="space-y-4">
+      <h3 className="font-sans text-lg font-semibold text-foreground">
+        From Predictive to Prescriptive
+      </h3>
+      <p className="text-sm text-foreground leading-relaxed">
+        This equation changed the entire scope of the project. It wasn't just a predictive model anymore; it was a prescriptive control engine.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        With the structure matrix L established, I could treat the locked independent genes not just as static inputs, but as explicit control variables. By applying Boolean Control Network theory, I could systematically calculate the exact sequence of node perturbations (simulated drug targets) required to push the matrix x(t) out of the Mesenchymal attractor.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        I wasn't guessing which genes to target based on biological intuition. The linear algebra was literally handing me the optimal control path.
+      </p>
+    </section>
+
+    <section className="space-y-4">
+      <h3 className="font-sans text-lg font-semibold text-foreground">
+        Conclusion
+      </h3>
+      <p className="text-sm text-foreground leading-relaxed">
+        Whether you are building an anomaly detection LSTM for vehicle telemetry, standing up an agentic API gateway, or mapping a Markov process for a cancer cell, the core engineering principles remain exactly the same: clean your data, constrain your variables, and trust the math.
+      </p>
+    </section>
+
+    <nav className="pt-8 border-t border-border flex justify-between">
+      <a
+        href="/blog/engineering-cell-part-2"
+        className="font-mono text-sm text-primary hover:underline"
+      >
+        ← Part 2: Breaking the 0.5 Deadlock
+      </a>
+      <a
+        href="/blog"
+        className="font-mono text-sm text-primary hover:underline"
+      >
+        All posts →
+      </a>
+    </nav>
+  </article>
+</section>

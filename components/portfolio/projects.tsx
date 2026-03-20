@@ -10,6 +10,9 @@ interface Project {
   description: string
   tags: string[]
   hasGraphPlaceholders?: boolean
+  documentationUrl?: string
+  documentationLabel?: string
+  documentationError?: boolean
 }
 
 const projects: Project[] = [
@@ -17,8 +20,10 @@ const projects: Project[] = [
     id: "bocm-talii",
     title: "Applied Systems Engineering",
     subtitle: "BOCM / Talii",
-    description: "Full-stack mobile/web marketplace. Architected robust user auth and multi-party payment routing (barber payouts). Optimized with AI-assisted code generation.",
+    description: "Full-stack mobile/web cosmetologist marketplace. Architected robust user auth and multi-party payment routing (barber payouts). Optimized with AI-assisted code generation.",
     tags: ["Full-Stack", "Mobile", "Payment Routing", "Auth"],
+    documentationUrl: "https://github.com/yaskhalil/talii",
+    documentationLabel: "view_documentation",
   },
   {
     id: "axiom",
@@ -26,14 +31,36 @@ const projects: Project[] = [
     subtitle: "Axiom",
     description: "Conceptual AI agent gateway. Unified system interactions for Slack, Google Workspace, Square, and Sentry APIs.",
     tags: ["AI Agents", "API Gateway", "System Integration"],
+    documentationUrl: "https://github.com/AxiomAPI/MVP",
+    documentationLabel: "view_documentation",
   },
   {
     id: "boolean-dynamics",
-    title: "Mathematical Inquiry",
-    subtitle: "Boolean Dynamics",
-    description: "Benchmarking Semi-Tensor Product (STP) against Multivariate Regression for high-dimensional steady states.",
-    tags: ["STP", "Statistical Analysis", "Research"],
+    title: "Mathematical Inquiry & Intervention Scoring",
+    subtitle: "STP vs Regression | pyMaBoSS | Boolean subnets -> PPI",
+    description: "Efficiency-Fidelity benchmark comparing Semi-Tensor Product (STP) algebraic linearization (exact logic preservation) vs multivariate least-squares regression (scalable dynamics) for cancer signaling circuits. Implementing both linearizations against stochastic Boolean networks with pyMaBoSS, starting from gene-expression driven circuits to evaluate behavior under drug-like perturbations. Developing intervention scoring approaches, transitioning from rule-curated Boolean subnets (~50-200 nodes) toward larger PPI graph structures.",
+    tags: ["STP", "pyMaBoSS", "Boolean Networks", "Interventions", "PPI", "Statistical Analysis"],
     hasGraphPlaceholders: true,
+    documentationUrl: "https://github.com/yaskhalil/Benchmark-STP-vs-MLLR",
+    documentationLabel: "view_documentation",
+  },
+  {
+    id: "levin-telematics",
+    title: "Levin Telematics Airflow Data Platform",
+    subtitle: "Airflow 3 / Astronomer CLI + Postgres",
+    description: "Production-style Airflow 3 pipeline ingests partitioned Levin vehicle telemetry, normalizes fields into a canonical schema, and generates curated daily rollups. Enforced idempotent loads (safe reruns/backfills via unique event keys), dynamic task mapping for date-range backfills, and run-level artifacts for operational visibility. Data contract validations: schema/type/range checks (timestamp parseability, non-null vehicle IDs, plausible bounds for speed/RPM/temp) with quality stats per partition.",
+    tags: ["Airflow 3", "Astronomer CLI", "Postgres", "Idempotency", "Telemetry"],
+    documentationUrl: "https://github.com/yaskhalil/levin-telematics-orchestration",
+    documentationLabel: "view_documentation",
+  },
+  {
+    id: "vehicle-health-monitoring",
+    title: "Vehicle Health Monitoring Pipeline",
+    subtitle: "BiLSTM + attention (seq anomalies) + DBSCAN (hotspots)",
+    description: "End-to-end vehicle health neural network using bi-directional LSTM with attention; improved anomaly detection accuracy from 40-60% to 87-95% through iterative retraining on 30K+ telemetry points every 10 minutes. Three-tier anomaly detection: LSTM for sequential insights, DBSCAN for geographic hotspot clustering; 33% increase in predictive reliability across simulated fleets. FastAPI microservices on Railway with Supabase integration.",
+    tags: ["PyTorch", "BiLSTM", "Attention", "DBSCAN", "FastAPI"],
+    documentationLabel: "error_code_classified",
+    documentationError: true,
   },
 ]
 
@@ -112,7 +139,7 @@ export function Projects() {
                   ))}
                 </div>
 
-                {/* Graph Placeholders for Boolean Dynamics */}
+                {/* Graph Placeholders for Boolean Dynamics
                 {project.hasGraphPlaceholders && (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="aspect-square border border-dashed border-border bg-secondary/20 rounded-sm flex items-center justify-center">
@@ -132,17 +159,25 @@ export function Projects() {
                       </div>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {/* View Project Link */}
                 <div className="mt-6 pt-4 border-t border-border">
-                  <a 
-                    href="#" 
-                    className="inline-flex items-center gap-2 font-mono text-sm text-primary hover:text-accent transition-colors group"
-                  >
-                    <span>view_documentation</span>
-                    <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  {project.documentationError ? (
+                    <span className="inline-flex items-center gap-2 font-mono text-sm text-destructive">
+                      {project.documentationLabel ?? "error_code_classified"}
+                    </span>
+                  ) : (
+                    <a
+                      href={project.documentationUrl ?? "#"}
+                      target={project.documentationUrl?.startsWith("http") ? "_blank" : undefined}
+                      rel={project.documentationUrl?.startsWith("http") ? "noopener noreferrer" : undefined}
+                      className="inline-flex items-center gap-2 font-mono text-sm text-primary hover:text-accent transition-colors group"
+                    >
+                      <span>{project.documentationLabel ?? "view_documentation"}</span>
+                      <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

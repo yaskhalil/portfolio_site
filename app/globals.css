@@ -91,3 +91,34 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* KaTeX: blend math with the site's foreground color */
+.katex {
+  color: var(--foreground);
+  background: transparent;
+}
+
+/* rehype-pretty-code (Shiki): minimal logical styling */
+pre {
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+pre [data-line] {
+  padding: 0 1rem;
+}
+
+/* Syntax colors driven by shiki theme vars (set by rehype-pretty-code) */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  code[data-theme*=" "],
+  code[data-theme*=" "] span {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
+  }
+}

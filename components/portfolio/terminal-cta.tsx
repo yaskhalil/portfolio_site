@@ -37,7 +37,7 @@ export function TerminalCTA() {
               <span className="text-foreground">cat ./status.txt</span>
             </div>
             <div className="font-mono text-base md:text-lg text-foreground pl-0 md:pl-0">
-              <span className="text-primary">{'>'}</span> Seeking a high-signal internship for Summer 2026.
+              <span className="text-primary">{'>'}</span> Seeking a new challenge.
             </div>
           </div>
 
@@ -61,7 +61,7 @@ export function TerminalCTA() {
               </a>
               
               <a 
-                href="https://github.com"
+                href="https://github.com/yaskhalil"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 font-mono text-sm text-muted-foreground hover:text-primary transition-colors group"
@@ -71,7 +71,7 @@ export function TerminalCTA() {
               </a>
               
               <a 
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/yaseenkhalil/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 font-mono text-sm text-muted-foreground hover:text-primary transition-colors group"

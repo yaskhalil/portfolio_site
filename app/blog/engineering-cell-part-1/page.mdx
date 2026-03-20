@@ -1,0 +1,74 @@
+export const metadata = {
+  title: "The 17,000-Dimensional Elephant | Engineering a Cell",
+  description: "From DepMap transcriptomics to a 30-gene Mesenchymal signature.",
+}
+
+<section className="px-6 md:px-12 lg:px-20 py-20 md:py-28 border-t border-border">
+  <div className="mb-10 md:mb-14">
+    <div className="font-mono text-xs text-muted-foreground mb-2">
+      <span className="text-primary">$</span> cat blog/engineering-cell-part-1
+    </div>
+    <h1 className="text-2xl md:text-3xl font-sans font-bold text-foreground">
+      The 17,000-Dimensional Elephant
+    </h1>
+    <p className="mt-3 font-mono text-sm text-muted-foreground">
+      Part 1 of Engineering a Cell · 2026-03-20
+    </p>
+  </div>
+
+  <article className="max-w-4xl space-y-8 font-mono">
+    <section className="space-y-4">
+      <h2 className="font-sans text-xl font-semibold text-foreground">
+        Engineering a Cell
+      </h2>
+      <p className="text-sm text-foreground leading-relaxed">
+        I'll be honest upfront: I don't have a deep biology background. My world is applied math, machine learning, and systems architecture. So when I look at a cancer cell, I don't see a biological mystery—I see a distributed system with a rogue routing protocol.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        For the last couple of months, I've been trying to mathematically model the Mesenchymal phenotype, a highly aggressive state where cancer cells gain metastatic properties. My goal wasn't just to predict if a cell would enter this state, but to build a control engine capable of calculating the exact perturbations needed to force it back to a healthy baseline.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        Building this pipeline—from scraping noise to fighting compilers, to eventually linearizing a biological network—felt exactly like architecting a backend data pipeline. Here is how I hacked the state-space.
+      </p>
+    </section>
+
+    <section className="space-y-4">
+      <h3 className="font-sans text-lg font-semibold text-foreground">
+        The 17,000-Dimensional Elephant in the Room
+      </h3>
+      <p className="text-sm text-foreground leading-relaxed">
+        When you first download transcriptomic data from the Cancer Dependency Map (DepMap), it doesn't look like biological insight; it looks like a wall of static. I was staring at a matrix mapping hundreds of cancer cell lines against 18,435 individual continuous gene expression scores.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        You can't build a dynamic Markov model with 18,000 variables. The state-space explosion would instantly melt my compute environment. I needed to find the "Master Regulators"—the exact genes driving the variance of this specific Mesenchymal state.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        Before running any models, I had to clean the data. Highly sparse genes introduce massive mathematical noise, so I wrote a strict filtering pipeline dropping any column with more than 90% missing values, followed by mean imputation. With a dense, continuous expression matrix ready, I moved to dimensionality reduction.
+      </p>
+    </section>
+
+    <section className="space-y-4">
+      <h3 className="font-sans text-lg font-semibold text-foreground">
+        The Unscaled PCA "Aha" Moment
+      </h3>
+      <p className="text-sm text-foreground leading-relaxed">
+        Standard data science practice dictates scaling your data (Z-score normalization) before running Principal Component Analysis (PCA). But biological thresholding is a different beast. If a Mesenchymal gene is massively over-expressed, that absolute magnitude matters. It's a physical reality of the cell, not just a statistical outlier.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        By running PCA on the unscaled expression data, I isolated the primary phenotypic axis. The results were stark. The data cleanly bifurcated into two distinct clusters: the positive-loading Mesenchymal Activators (like TGFBI, FN1), and the negative-loading Inhibitors.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        I had my core 30-gene Mesenchymal signature. Now, I needed to make it move over time.
+      </p>
+    </section>
+
+    <nav className="pt-8 border-t border-border">
+      <a
+        href="/blog/engineering-cell-part-2"
+        className="font-mono text-sm text-primary hover:underline"
+      >
+        Next: Breaking the 0.5 Deadlock →
+      </a>
+    </nav>
+  </article>
+</section>

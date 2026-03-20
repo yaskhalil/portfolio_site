@@ -1,0 +1,94 @@
+export const metadata = {
+  title: "Breaking the 0.5 Deadlock | Engineering a Cell",
+  description: "pyMaBoSS, threshold logic, and collapsing 1,140 attractors to three.",
+}
+
+<section className="px-6 md:px-12 lg:px-20 py-20 md:py-28 border-t border-border">
+  <div className="mb-10 md:mb-14">
+    <div className="font-mono text-xs text-muted-foreground mb-2">
+      <span className="text-primary">$</span> cat blog/engineering-cell-part-2
+    </div>
+    <h1 className="text-2xl md:text-3xl font-sans font-bold text-foreground">
+      Breaking the 0.5 Deadlock
+    </h1>
+    <p className="mt-3 font-mono text-sm text-muted-foreground">
+      Part 2 of Engineering a Cell · 2026-03-20
+    </p>
+  </div>
+
+  <article className="max-w-4xl space-y-8 font-mono">
+    <section className="space-y-4">
+      <h3 className="font-sans text-lg font-semibold text-foreground">
+        The 0.5 Deadlock
+      </h3>
+      <p className="text-sm text-foreground leading-relaxed">
+        To simulate the network's dynamics as a continuous-time Markov process, I used pyMaBoSS (the Gillespie algorithm). But before I could run a single simulation, I had to survive an infrastructure hellscape. MaBoSS relies heavily on compiled C++ binaries. Trying to force those to play nicely with standard Python data science libraries in a cloud notebook resulted in hours of kernel crashes. I finally had to override the installation pipeline and manually append the binaries to the system path.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        Environment stable. I loaded up the data for ACH-001113 (a heavily Mesenchymal cell line), mapped the initial states, and hit run.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        The terminal steady-state probabilities printed out:
+      </p>
+      <pre className="text-sm text-muted-foreground bg-secondary/50 p-4 rounded-sm overflow-x-auto">
+{`TGFBI: 0.4999
+CD53: 0.4993
+FN1: 0.5012`}
+      </pre>
+      <p className="text-sm text-foreground leading-relaxed">
+        Every single node in the network had flatlined at exactly ~0.5.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        In a stochastic network, a 0.5 probability across the board means the system is in a global deadlock. The network couldn't decide if the cell was healthy or Mesenchymal; it was stuck in computational purgatory. My initial state mapping was using linear clamping, and it simply wasn't providing enough signal-to-noise separation.
+      </p>
+    </section>
+
+    <section className="space-y-4">
+      <h3 className="font-sans text-lg font-semibold text-foreground">
+        The Fix: Threshold Logic
+      </h3>
+      <p className="text-sm text-foreground leading-relaxed">
+        I scrapped the linear clamping and replaced it with a gene-wise Logistic Z-Score Normalization derived directly from the transcriptomic distributions. But the routing logic itself also needed an overhaul.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        To break the deadlock, I wrote a strict Threshold Logic (Majority Rule) protocol. For any given node <span className="text-primary">v</span>, its next state was determined purely by the balance of its activating (A) versus inhibiting (I) signals:
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        Rate<sub>up</sub>(v) = 1.0 if ∑A &gt; ∑I, otherwise 0.0
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        I ran it again. The 0.5 deadlock shattered. The network dynamically routed the signals and locked into strictly polarized states.
+      </p>
+    </section>
+
+    <section className="space-y-4">
+      <h3 className="font-sans text-lg font-semibold text-foreground">
+        The Dimensionality Nightmare (Again)
+      </h3>
+      <p className="text-sm text-foreground leading-relaxed">
+        I had successfully modeled the disease state, but I had accidentally created a monster. By leaving the independent variables unconstrained, the model was generating over 1,140 distinct biological attractors. You can't run prescriptive control theory on a state-space that massive.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        To stop the explosion, I ran a topological analysis on the 30-gene module to isolate the core "Engine" of highly connected hub nodes. I took the peripheral independent inputs and hard-locked them to the specific transcriptomic signatures of ACH-001113.
+      </p>
+      <p className="text-sm text-foreground leading-relaxed">
+        By constraining the inputs, the discrete model dropped from 1,140 attractors down to exactly three. Even better, one of those three was a precise mathematical match for the high-expression Mesenchymal phenotype I was hunting for.
+      </p>
+    </section>
+
+    <nav className="pt-8 border-t border-border flex justify-between">
+      <a
+        href="/blog/engineering-cell-part-1"
+        className="font-mono text-sm text-primary hover:underline"
+      >
+        ← Part 1: The 17,000-Dimensional Elephant
+      </a>
+      <a
+        href="/blog/engineering-cell-part-3"
+        className="font-mono text-sm text-primary hover:underline"
+      >
+        Next: Turning Cells into Matrices →
+      </a>
+    </nav>
+  </article>
+</section>

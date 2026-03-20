@@ -1,10 +1,57 @@
 "use client"
 
+import Link from "next/link"
+
 const skills = [
-  { category: "STATISTICAL_METHODS", items: ["Principal Component Analysis (PCA)", "Singular Value Decomposition (SVD)", "Multivariate Linear Regression"] },
-  { category: "DYNAMICAL_SYSTEMS", items: ["Semi-Tensor Product (STP)", "Attractor Dynamics"] },
-  { category: "LANGUAGES", items: ["Python (PyTorch)", "Java"] },
-  { category: "INFRASTRUCTURE", items: ["Apache Airflow 3", "Full-Stack Architecture", "Payment Routing"] },
+  {
+    category: "DATA_ENGINEERING",
+    href: "/infrastructure",
+    items: [
+      "Airflow 3 + Astronomer CLI",
+      "Partitioned telemetry ingestion",
+      "Dynamic task mapping for backfills",
+      "Idempotent loads via event/partition keys",
+      "Postgres normalization + constraints",
+      "Dockerized operational pipelines",
+    ],
+  },
+  {
+    category: "STATISTICAL_METHODS",
+    items: [
+      "PCA / SVD",
+      "Multivariate linear regression",
+      "Lasso (L1) feature selection",
+      "Ridge (L2) multicollinearity control",
+      "Madelon regularization under distractors",
+    ],
+  },
+  {
+    category: "DEEP_LEARNING",
+    items: [
+      "BiLSTM + attention anomaly detection",
+      "PyTorch sequence models",
+      "10-minute micro-batch training",
+      "DBSCAN hotspot clustering",
+      "Sequential anomaly pipelines",
+    ],
+  },
+  {
+    category: "DYNAMICAL_SYSTEMS",
+    items: [
+      "Semi-Tensor Product (STP) algebraic linearization",
+      "Attractor dynamics",
+      "Boolean network dynamics",
+      "Intervention scoring (pyMaBoSS)",
+    ],
+  },
+  {
+    category: "LANGUAGES_PRIMARY",
+    items: ["Python", "Java", "R", "SQL"],
+  },
+  {
+    category: "LANGUAGES_EXPERIMENTING",
+    items: ["TypeScript", "Go", "Mojo", "KDB/q", "CSS", "PostgreSQL"],
+  },
 ]
 
 export function TechnicalMatrix() {
@@ -47,9 +94,18 @@ export function TechnicalMatrix() {
                       <span className="text-muted-foreground">
                         {String(itemIndex + 1).padStart(2, '0')}
                       </span>
-                      <span className="group-hover:text-primary transition-colors duration-200">
-                        {item}
-                      </span>
+                      {group.href ? (
+                        <Link
+                          href={group.href}
+                          className="group-hover:text-primary transition-colors duration-200 hover:underline underline-offset-4"
+                        >
+                          {item}
+                        </Link>
+                      ) : (
+                        <span className="group-hover:text-primary transition-colors duration-200">
+                          {item}
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>
