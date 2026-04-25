@@ -9,10 +9,11 @@ interface Project {
   subtitle: string
   description: string
   tags: string[]
-  hasGraphPlaceholders?: boolean
   documentationUrl?: string
   documentationLabel?: string
   documentationError?: boolean
+  statusLabel?: string
+  statusUrl?: string
 }
 
 const projects: Project[] = [
@@ -20,47 +21,54 @@ const projects: Project[] = [
     id: "bocm-talii",
     title: "Applied Systems Engineering",
     subtitle: "BOCM / Talii",
-    description: "Full-stack mobile/web cosmetologist marketplace. Architected robust user auth and multi-party payment routing (barber payouts). Optimized with AI-assisted code generation.",
+    description: "Built the end-to-end product foundation for a cosmetologist marketplace across web and mobile, with a focus on account reliability and multi-party transaction flows. The work centered on making core booking and payout operations dependable enough for daily production use.",
     tags: ["Full-Stack", "Mobile", "Payment Routing", "Auth"],
     documentationUrl: "https://github.com/yaskhalil/talii",
     documentationLabel: "view_documentation",
+    statusLabel: "Code Available",
+    statusUrl: "https://github.com/yaskhalil/talii",
   },
   {
     id: "axiom",
     title: "Startup Infrastructure",
     subtitle: "Axiom",
-    description: "Conceptual AI agent gateway. Unified system interactions for Slack, Google Workspace, Square, and Sentry APIs.",
+    description: "Designed an early-stage orchestration layer for AI agents to interact with core business platforms through one consistent interface. The intent was to reduce integration complexity so product teams could automate workflows without rebuilding connectors for each service.",
     tags: ["AI Agents", "API Gateway", "System Integration"],
     documentationUrl: "https://github.com/AxiomAPI/MVP",
     documentationLabel: "view_documentation",
+    statusLabel: "Code Available",
+    statusUrl: "https://github.com/AxiomAPI/MVP",
   },
   {
     id: "boolean-dynamics",
-    title: "Mathematical Inquiry & Intervention Scoring",
+    title: "Computational Systems Biology Research",
     subtitle: "STP vs Regression | pyMaBoSS | Boolean subnets -> PPI",
-    description: "Efficiency-Fidelity benchmark comparing Semi-Tensor Product (STP) algebraic linearization (exact logic preservation) vs multivariate least-squares regression (scalable dynamics) for cancer signaling circuits. Implementing both linearizations against stochastic Boolean networks with pyMaBoSS, starting from gene-expression driven circuits to evaluate behavior under drug-like perturbations. Developing intervention scoring approaches, transitioning from rule-curated Boolean subnets (~50-200 nodes) toward larger PPI graph structures.",
+    description: "Led a research direction centered on a Semi-Tensor-Product-based Graph Neural Network for cancer signaling analysis. The architecture uses STP operators to preserve logical structure while enabling differentiable learning, then integrates stochastic simulation outputs to study attractor behavior and intervention sensitivity as biological network scale increases.",
     tags: ["STP", "pyMaBoSS", "Boolean Networks", "Interventions", "PPI", "Statistical Analysis"],
-    hasGraphPlaceholders: true,
     documentationUrl: "https://github.com/yaskhalil/Benchmark-STP-vs-MLLR",
     documentationLabel: "view_documentation",
+    statusLabel: "ArXiv Publication Coming Soon",
   },
   {
     id: "levin-telematics",
-    title: "Levin Telematics Airflow Data Platform",
+    title: "Data Platform Engineering",
     subtitle: "Airflow 3 / Astronomer CLI + Postgres",
-    description: "Production-style Airflow 3 pipeline ingests partitioned Levin vehicle telemetry, normalizes fields into a canonical schema, and generates curated daily rollups. Enforced idempotent loads (safe reruns/backfills via unique event keys), dynamic task mapping for date-range backfills, and run-level artifacts for operational visibility. Data contract validations: schema/type/range checks (timestamp parseability, non-null vehicle IDs, plausible bounds for speed/RPM/temp) with quality stats per partition.",
+    description: "Engineered a production-oriented telemetry pipeline architecture with Airflow 3 and Postgres to transform raw vehicle streams into reliable analytics datasets. The workflow emphasizes replay-safe ingestion, backfill flexibility, and strong data contracts so downstream teams can trust operational and trend reporting.",
     tags: ["Airflow 3", "Astronomer CLI", "Postgres", "Idempotency", "Telemetry"],
     documentationUrl: "https://github.com/yaskhalil/levin-telematics-orchestration",
     documentationLabel: "view_documentation",
+    statusLabel: "Posting Soon",
   },
   {
     id: "vehicle-health-monitoring",
-    title: "Vehicle Health Monitoring Pipeline",
-    subtitle: "BiLSTM + attention (seq anomalies) + DBSCAN (hotspots)",
-    description: "End-to-end vehicle health neural network using bi-directional LSTM with attention; improved anomaly detection accuracy from 40-60% to 87-95% through iterative retraining on 30K+ telemetry points every 10 minutes. Three-tier anomaly detection: LSTM for sequential insights, DBSCAN for geographic hotspot clustering; 33% increase in predictive reliability across simulated fleets. FastAPI microservices on Railway with Supabase integration.",
+    title: "ML Engineering for Fleet Reliability",
+    subtitle: "HoneyRuns | Sequence modeling + anomaly detection",
+    description: "Built and iterated on machine learning workflows for vehicle-health signal interpretation, combining sequence models and clustering to detect risk patterns before service disruption. This work translated high-volume telematics streams into practical maintenance intelligence that supports faster intervention planning.",
     tags: ["PyTorch", "BiLSTM", "Attention", "DBSCAN", "FastAPI"],
-    documentationLabel: "error_code_classified",
-    documentationError: true,
+    documentationUrl: "https://www.honeyruns.com",
+    documentationLabel: "visit_honeyruns",
+    statusLabel: "Live",
+    statusUrl: "https://www.honeyruns.com",
   },
 ]
 
@@ -162,7 +170,23 @@ export function Projects() {
                 )} */}
 
                 {/* View Project Link */}
-                <div className="mt-6 pt-4 border-t border-border">
+                <div className="mt-6 pt-4 border-t border-border flex flex-wrap items-center gap-3">
+                  {project.statusLabel && (
+                    project.statusUrl ? (
+                      <a
+                        href={project.statusUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1 font-mono text-xs text-primary hover:bg-primary/20 transition-colors"
+                      >
+                        {project.statusLabel}
+                      </a>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full border border-border bg-secondary/40 px-3 py-1 font-mono text-xs text-muted-foreground">
+                        {project.statusLabel}
+                      </span>
+                    )
+                  )}
                   {project.documentationError ? (
                     <span className="inline-flex items-center gap-2 font-mono text-sm text-destructive">
                       {project.documentationLabel ?? "error_code_classified"}
