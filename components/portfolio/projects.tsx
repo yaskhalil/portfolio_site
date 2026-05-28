@@ -7,7 +7,8 @@ interface Project {
   id: string
   title: string
   subtitle: string
-  description: string
+  description?: string
+  bullets?: string[]
   tags: string[]
   documentationUrl?: string
   documentationLabel?: string
@@ -18,62 +19,74 @@ interface Project {
 
 const projects: Project[] = [
   {
-    id: "bocm-talii",
-    title: "Applied Systems Engineering",
-    subtitle: "BOCM / Talii",
-    description: "Built the end-to-end product foundation for a cosmetologist marketplace across web and mobile, with a focus on account reliability and multi-party transaction flows. The work centered on making core booking and payout operations dependable enough for daily production use.",
-    tags: ["Full-Stack", "Mobile", "Payment Routing", "Auth"],
+    id: "temple-university",
+    title: "Temple University",
+    subtitle: "Machine Learning Research Intern | Hybrid | May 2026 – Present",
+    bullets: [
+      "Architecting analytical software to evaluate neural gene expression, focusing on high-dimensional system dynamics in developmental models.",
+      "Implementing KSG k-Nearest Neighbors (KSG-KNN) estimators to process complex datasets, extracting novel computational metrics to accelerate laboratory investigation."
+    ],
+    tags: ["Machine Learning", "Neural Gene Expression", "KSG-KNN", "Systems Biology"],
+    documentationLabel: "Research Ongoing",
+  },
+  {
+    id: "vt-science",
+    title: "Virginia Tech College of Science",
+    subtitle: "Undergraduate Joint Researcher | On-site | Dec 2025 – Present",
+    bullets: [
+      "Architected a PyTorch-based Semi-Tensor Product Graph Neural Network (STP-GNN), engineering an algebraic transition operator using Khatri-Rao assembly to map discrete Boolean logic into a continuous, differentiable landscape scaled for 2²⁰+ state-space circuits.",
+      "Condensed a 30-variable module from an unstable 1,140+ attractor space down to 3 functional basins, executing 10,000-trajectory stochastic simulations to mathematically prove absolute structural robustness within the system dynamics.",
+      "Engineered gradient-directed perturbation algorithms to bypass invariant manifold bottlenecks, validating the architecture against discrete probabilistic baselines with <0.1% variance."
+    ],
+    tags: ["PyTorch", "STP-GNN", "State-Space", "Stochastic Simulation"],
+    documentationUrl: "https://github.com/yaskhalil/Benchmark-STP-vs-MLLR",
+    documentationLabel: "view_research_code",
+    statusLabel: "ArXiv Publication Coming Soon",
+  },
+  {
+    id: "talii",
+    title: "Talii",
+    subtitle: "Co-Founder & Full-Stack Engineer | Hybrid | May 2025 – Mar 2026",
+    bullets: [
+      "Engineered and launched a cross-platform ecosystem using a unified TypeScript mono-repo and 110+ modular components, ensuring feature parity across web and native mobile applications.",
+      "Designed and normalized a PostgreSQL schema to support distributed scheduling, entity locations, and analytics with scalable RLS-based security."
+    ],
+    tags: ["TypeScript Mono-repo", "React Native", "PostgreSQL", "RLS Security"],
     documentationUrl: "https://github.com/yaskhalil/talii",
-    documentationLabel: "view_documentation",
+    documentationLabel: "view_code",
     statusLabel: "Code Available",
     statusUrl: "https://github.com/yaskhalil/talii",
   },
   {
-    id: "axiom",
-    title: "Startup Infrastructure",
-    subtitle: "Axiom",
-    description: "Designed an early-stage orchestration layer for AI agents to interact with core business platforms through one consistent interface. The intent was to reduce integration complexity so product teams could automate workflows without rebuilding connectors for each service.",
-    tags: ["AI Agents", "API Gateway", "System Integration"],
-    documentationUrl: "https://github.com/AxiomAPI/MVP",
-    documentationLabel: "view_documentation",
-    statusLabel: "Code Available",
-    statusUrl: "https://github.com/AxiomAPI/MVP",
-  },
-  {
-    id: "boolean-dynamics",
-    title: "Computational Systems Biology Research",
-    subtitle: "STP vs Regression | pyMaBoSS | Boolean subnets -> PPI",
-    description: "Led a research direction centered on a Semi-Tensor-Product-based Graph Neural Network for cancer signaling analysis. The architecture uses STP operators to preserve logical structure while enabling differentiable learning, then integrates stochastic simulation outputs to study attractor behavior and intervention sensitivity as biological network scale increases.",
-    tags: ["STP", "pyMaBoSS", "Boolean Networks", "Interventions", "PPI", "Statistical Analysis"],
-    documentationUrl: "https://github.com/yaskhalil/Benchmark-STP-vs-MLLR",
-    documentationLabel: "view_documentation",
-    statusLabel: "ArXiv Publication Coming Soon",
-  },
-  {
-    id: "levin-telematics",
-    title: "Data Platform Engineering",
-    subtitle: "Airflow 3 / Astronomer CLI + Postgres",
-    description: "Engineered a production-oriented telemetry pipeline architecture with Airflow 3 and Postgres to transform raw vehicle streams into reliable analytics datasets. The workflow emphasizes replay-safe ingestion, backfill flexibility, and strong data contracts so downstream teams can trust operational and trend reporting.",
-    tags: ["Airflow 3", "Astronomer CLI", "Postgres", "Idempotency", "Telemetry"],
-    documentationUrl: "https://github.com/yaskhalil/levin-telematics-orchestration",
-    documentationLabel: "view_documentation",
-    statusLabel: "Posting Soon",
-  },
-  {
-    id: "vehicle-health-monitoring",
-    title: "ML Engineering for Fleet Reliability",
-    subtitle: "HoneyRuns | Sequence modeling + anomaly detection",
-    description: "Built and iterated on machine learning workflows for vehicle-health signal interpretation, combining sequence models and clustering to detect risk patterns before service disruption. This work translated high-volume telematics streams into practical maintenance intelligence that supports faster intervention planning.",
-    tags: ["PyTorch", "BiLSTM", "Attention", "DBSCAN", "FastAPI"],
+    id: "honeyruns",
+    title: "HoneyRuns",
+    subtitle: "Machine Learning Engineer (Intern) | Remote | May 2025 – Jul 2025",
+    bullets: [
+      "Designed and deployed an end-to-end vehicle health monitoring neural network leveraging a bi-directional LSTM with attention mechanisms.",
+      "Improved anomaly detection accuracy from 40-60% to 87-95% through iterative retraining on 30K+ telemetry points every 10 minutes.",
+      "Architected a three-tier anomaly detection pipeline utilizing LSTM for sequential insights and DBSCAN for geographic hotspot clustering.",
+      "Built scalable FastAPI microservices on Railway with Supabase integration, exposing telemetry insights via an internal dashboard UI."
+    ],
+    tags: ["BiLSTM", "Attention Mechanisms", "DBSCAN", "FastAPI", "Supabase"],
     documentationUrl: "https://www.honeyruns.com",
     documentationLabel: "visit_honeyruns",
     statusLabel: "Live",
     statusUrl: "https://www.honeyruns.com",
   },
+  {
+    id: "diggeridoos",
+    title: "The Diggeridoos",
+    subtitle: "Software Member | On-site | Jan 2025 – May 2025",
+    bullets: [
+      "Developed responsive web components and interactive front-end features utilizing JavaScript and React.js."
+    ],
+    tags: ["JavaScript", "React.js", "Frontend"],
+    documentationLabel: "Academic Project",
+  },
 ]
 
 export function Projects() {
-  const [expandedId, setExpandedId] = useState<string | null>("bocm-talii")
+  const [expandedId, setExpandedId] = useState<string | null>("temple-university")
 
   const toggleProject = (id: string) => {
     setExpandedId(expandedId === id ? null : id)
@@ -127,13 +140,24 @@ export function Projects() {
             {/* Accordion Content */}
             <div 
               className={`overflow-hidden transition-all duration-300 ${
-                expandedId === project.id ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                expandedId === project.id ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
               <div className="p-6 pt-0 border-t border-border">
-                <p className="font-mono text-sm text-muted-foreground leading-relaxed mb-6">
-                  <span className="text-accent">{'>'}</span> {project.description}
-                </p>
+                {project.bullets ? (
+                  <ul className="space-y-3 mb-6">
+                    {project.bullets.map((bullet, bIndex) => (
+                      <li key={bIndex} className="font-mono text-sm text-muted-foreground leading-relaxed flex items-start gap-2">
+                        <span className="text-accent shrink-0 mt-1">{'>'}</span>
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : project.description ? (
+                  <p className="font-mono text-sm text-muted-foreground leading-relaxed mb-6">
+                    <span className="text-accent">{'>'}</span> {project.description}
+                  </p>
+                ) : null}
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-6">
@@ -146,28 +170,6 @@ export function Projects() {
                     </span>
                   ))}
                 </div>
-
-                {/* Graph Placeholders for Boolean Dynamics
-                {project.hasGraphPlaceholders && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="aspect-square border border-dashed border-border bg-secondary/20 rounded-sm flex items-center justify-center">
-                      <div className="text-center font-mono text-xs text-muted-foreground">
-                        <div className="w-12 h-12 border border-border mx-auto mb-2 flex items-center justify-center">
-                          <span className="text-primary text-lg">G1</span>
-                        </div>
-                        <p>STP_BENCHMARK</p>
-                      </div>
-                    </div>
-                    <div className="aspect-square border border-dashed border-border bg-secondary/20 rounded-sm flex items-center justify-center">
-                      <div className="text-center font-mono text-xs text-muted-foreground">
-                        <div className="w-12 h-12 border border-border mx-auto mb-2 flex items-center justify-center">
-                          <span className="text-primary text-lg">G2</span>
-                        </div>
-                        <p>REGRESSION_ANALYSIS</p>
-                      </div>
-                    </div>
-                  </div>
-                )} */}
 
                 {/* View Project Link */}
                 <div className="mt-6 pt-4 border-t border-border flex flex-wrap items-center gap-3">
@@ -192,15 +194,23 @@ export function Projects() {
                       {project.documentationLabel ?? "error_code_classified"}
                     </span>
                   ) : (
-                    <a
-                      href={project.documentationUrl ?? "#"}
-                      target={project.documentationUrl?.startsWith("http") ? "_blank" : undefined}
-                      rel={project.documentationUrl?.startsWith("http") ? "noopener noreferrer" : undefined}
-                      className="inline-flex items-center gap-2 font-mono text-sm text-primary hover:text-accent transition-colors group"
-                    >
-                      <span>{project.documentationLabel ?? "view_documentation"}</span>
-                      <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </a>
+                    project.documentationUrl ? (
+                      <a
+                        href={project.documentationUrl}
+                        target={project.documentationUrl.startsWith("http") ? "_blank" : undefined}
+                        rel={project.documentationUrl.startsWith("http") ? "noopener noreferrer" : undefined}
+                        className="inline-flex items-center gap-2 font-mono text-sm text-primary hover:text-accent transition-colors group"
+                      >
+                        <span>{project.documentationLabel ?? "view_documentation"}</span>
+                        <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    ) : (
+                      project.documentationLabel && (
+                        <span className="inline-flex items-center gap-2 font-mono text-sm text-muted-foreground">
+                          {project.documentationLabel}
+                        </span>
+                      )
+                    )
                   )}
                 </div>
               </div>

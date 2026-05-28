@@ -1,56 +1,54 @@
 "use client"
 
-import Link from "next/link"
 
 const skills = [
   {
-    category: "DATA_ENGINEERING",
-    href: "/infrastructure",
+    category: "Computational Modeling",
     items: [
-      "Airflow 3 + Astronomer CLI",
-      "Partitioned telemetry ingestion",
-      "Dynamic task mapping for backfills",
-      "Idempotent loads via event/partition keys",
-      "Postgres normalization + constraints",
-      "Dockerized operational pipelines",
+      "High-Dimensional System Dynamics",
+      "Semi-Tensor Product (STP) Algebra",
+      "Graph Neural Networks (GNNs)",
+      "Probabilistic Boolean Networks (PBNs)",
+      "Stochastic Simulations",
+      "Discrete Network Robustness",
     ],
   },
   {
-    category: "STATISTICAL_METHODS",
+    category: "Data Science & Machine Learning",
     items: [
-      "PCA / SVD",
-      "Multivariate linear regression",
-      "Lasso (L1) feature selection",
-      "Ridge (L2) multicollinearity control",
-      "Madelon regularization under distractors",
+      "Deep Learning (Bi-LSTM, Attention Mechanisms)",
+      "High-Dimensional Data Analysis (KSG-KNN Estimators)",
+      "Clustering Algorithms (DBSCAN)",
+      "Neural Gene Expression Dynamics",
     ],
   },
   {
-    category: "DEEP_LEARNING",
+    category: "Software Engineering & Architecture",
     items: [
-      "BiLSTM + attention anomaly detection",
-      "PyTorch sequence models",
-      "10-minute micro-batch training",
-      "DBSCAN hotspot clustering",
-      "Sequential anomaly pipelines",
+      "Microservices & API Design (FastAPI)",
+      "Cross-Platform Mono-repos (TypeScript)",
+      "Relational Schema & RLS Security (Postgres)",
+      "Modular Frontend Component Architectures",
+      "High-Throughput Streaming Telematics",
     ],
   },
   {
-    category: "DYNAMICAL_SYSTEMS",
+    category: "Languages (Primary)",
+    items: ["Python", "Go", "Java", "R", "SQL"],
+  },
+  {
+    category: "Languages (Secondary)",
+    items: ["TypeScript", "Mojo", "KDB/q", "CSS"],
+  },
+  {
+    category: "Athletics & Lifestyle",
     items: [
-      "Semi-Tensor Product (STP) algebraic linearization",
-      "Attractor dynamics",
-      "Boolean network dynamics",
-      "Intervention scoring (pyMaBoSS)",
+      "Brazilian Jiu-Jitsu",
+      "MMA",
+      "Boxing",
+      "Weightlifting",
+      "Running",
     ],
-  },
-  {
-    category: "LANGUAGES_PRIMARY",
-    items: ["Python", "Java", "R", "SQL"],
-  },
-  {
-    category: "LANGUAGES_SECONDARY",
-    items: ["TypeScript", "Go", "Mojo", "KDB/q", "CSS", "PostgreSQL"],
   },
 ]
 
@@ -80,32 +78,21 @@ export function TechnicalMatrix() {
         {/* Skills grid */}
         <div className="p-6 md:p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-            {skills.map((group, groupIndex) => (
+            {skills.map((group) => (
               <div key={group.category} className="space-y-4">
-                <div className="font-mono text-xs text-primary">
-                  [{String(groupIndex).padStart(2, '0')}] {group.category}
+                <div className="font-mono text-xs text-primary uppercase tracking-wider">
+                  {group.category}
                 </div>
                 <ul className="space-y-2">
-                  {group.items.map((item, itemIndex) => (
+                  {group.items.map((item) => (
                     <li 
                       key={item}
-                      className="font-mono text-sm text-foreground flex items-start gap-3 group"
+                      className="font-mono text-sm text-foreground flex items-start gap-2 group"
                     >
-                      <span className="text-muted-foreground">
-                        {String(itemIndex + 1).padStart(2, '0')}
+                      <span className="text-accent shrink-0 mt-1">{'>'}</span>
+                      <span className="group-hover:text-primary transition-colors duration-200">
+                        {item}
                       </span>
-                      {group.href ? (
-                        <Link
-                          href={group.href}
-                          className="group-hover:text-primary transition-colors duration-200 hover:underline underline-offset-4"
-                        >
-                          {item}
-                        </Link>
-                      ) : (
-                        <span className="group-hover:text-primary transition-colors duration-200">
-                          {item}
-                        </span>
-                      )}
                     </li>
                   ))}
                 </ul>
