@@ -2,6 +2,12 @@ import Link from "next/link"
 
 const posts = [
   {
+    slug: "the-idea-of-insecurity",
+    title: "The Idea Of Insecurity",
+    description: "On the trap of modern comparison, and what a hot shower reminded me about my younger self.",
+    date: "2026-07-05",
+  },
+  {
     slug: "engineering-cell-part-1",
     title: "The 17,000-Dimensional Elephant",
     description: "From DepMap transcriptomics to a 30-gene Mesenchymal signature.",
@@ -47,7 +53,7 @@ export default function BlogPage() {
             className="block p-6 border border-border bg-card rounded-sm hover:border-primary/50 hover:bg-secondary/20 transition-colors group"
           >
             <div className="font-mono text-xs text-muted-foreground mb-2">
-              Part {post.part} · {post.date}
+              {'part' in post ? `Part ${(post as typeof posts[number]).part} · ` : ''}{post.date}
             </div>
             <h2 className="text-lg font-sans font-semibold text-foreground group-hover:text-primary transition-colors">
               {post.title}
