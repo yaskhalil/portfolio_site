@@ -22,8 +22,8 @@ export default function TerminalCursor() {
     }
     window.addEventListener('mousemove', onMouseMove)
 
-    const BULLET_SPEED = 9
-    const BULLET_LIFE = 60
+    const BULLET_SPEED = 14
+    const BULLET_LIFE = 100
     const MAX_BULLETS = 20
     const SPREAD = 0.3
 

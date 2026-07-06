@@ -112,11 +112,41 @@ type Asteroid = {
   rotationSpeed: number
 }
 
+type Particle = {
+  id: number
+  x: number
+  y: number
+  vx: number
+  vy: number
+  life: number
+  maxLife: number
+  color: string
+}
+
+const ASTEROID_SPEEDS = [1.2, 1.8, 2.5]
+const SPAWN_INTERVALS = [3500, 2500, 1500]
+
 export function TechnicalMatrix() {
   const [hp, setHp] = useState(3)
   const glitchedRef = useRef<Set<number>>(new Set())
   const [, forceRender] = useState(0)
   const [showDirections, setShowDirections] = useState(false)
+  const [score, setScore] = useState(0)
+  const [wave, setWave] = useState(1)
+  const [waveFlash, setWaveFlash] = useState<string | null>(null)
+  const [shaking, setShaking] = useState(false)
+
+  // Particle refs
+  const particlesRef = useRef<Particle[]>([])
+  const particleElsRef = useRef<Map<number, HTMLDivElement>>(new Map())
+  const particlesContainerRef = useRef<HTMLDivElement>(null)
+  const particleIdRef = useRef(0)
+
+  // Wave tracking refs
+  const totalTimeRef = useRef(0)
+  const prevWaveRef = useRef(1)
+  const waveFlashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const asteroidSpeedRef = useRef(ASTEROID_SPEEDS[0])
 
   // Game state refs (mutable, no re-render)
   const asteroidsRef = useRef<Asteroid[]>([])
@@ -177,7 +207,7 @@ export function TechnicalMatrix() {
     const dx = cx - x
     const dy = cy - y
     const dist = Math.sqrt(dx * dx + dy * dy)
-    const speed = 1 + Math.random() * 1
+    const speed = asteroidSpeedRef.current + Math.random() * 0.5
 
     const asteroid: Asteroid = {
       id: asteroidIdRef.current++,
@@ -236,6 +266,42 @@ export function TechnicalMatrix() {
     setTimeout(() => el.remove(), 250)
   }, [])
 
+  const spawnParticles = useCallback((x: number, y: number) => {
+    const count = 6 + Math.floor(Math.random() * 3) // 6-8
+    const colors = ['#f97316', '#facc15', '#ef4444']
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2
+      const speed = 2 + Math.random() * 3
+      const particle: Particle = {
+        id: particleIdRef.current++,
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 20,
+        maxLife: 20,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      }
+      particlesRef.current.push(particle)
+
+      const el = document.createElement('div')
+      el.style.cssText = `
+        position: fixed;
+        left: ${x}px;
+        top: ${y}px;
+        width: 4px;
+        height: 4px;
+        background: ${particle.color};
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 60;
+        pointer-events: none;
+      `
+      particlesContainerRef.current?.appendChild(el)
+      particleElsRef.current.set(particle.id, el)
+    }
+  }, [])
+
   // Game loop
   useEffect(() => {
     if (hp <= 0) {
@@ -244,12 +310,19 @@ export function TechnicalMatrix() {
       asteroidElsRef.current.forEach((el) => el.remove())
       asteroidElsRef.current.clear()
       asteroidsRef.current = []
+      // Clear particles
+      particleElsRef.current.forEach((el) => el.remove())
+      particleElsRef.current.clear()
+      particlesRef.current = []
       return
     }
 
     gameRunningRef.current = true
     let rafId: number
     let prevTime = 0
+    totalTimeRef.current = 0
+    prevWaveRef.current = 1
+    asteroidSpeedRef.current = ASTEROID_SPEEDS[0]
 
     const tick = (time: number) => {
       if (!gameRunningRef.current) {
@@ -260,17 +333,37 @@ export function TechnicalMatrix() {
       const dt = prevTime ? time - prevTime : 16
       prevTime = time
 
+      // Wave escalation — every 15s of cumulative runtime
+      totalTimeRef.current += dt
+      const newWave = Math.floor(totalTimeRef.current / 15000) + 1
+      if (newWave !== prevWaveRef.current) {
+        prevWaveRef.current = newWave
+        setWave(newWave)
+        const waveIdx = Math.min(newWave - 1, ASTEROID_SPEEDS.length - 1)
+        asteroidSpeedRef.current = ASTEROID_SPEEDS[waveIdx]
+        setWaveFlash(`WAVE ${newWave}`)
+        if (waveFlashTimeoutRef.current) clearTimeout(waveFlashTimeoutRef.current)
+        waveFlashTimeoutRef.current = setTimeout(() => setWaveFlash(null), 2000)
+      }
+
+      const waveIdx = Math.min(
+        Math.max(Math.floor(totalTimeRef.current / 15000), 0),
+        SPAWN_INTERVALS.length - 1
+      )
+      const spawnInterval = SPAWN_INTERVALS[waveIdx]
+
       // Spawn timer
       spawnAccumRef.current += dt
       if (spawnAccumRef.current >= nextSpawnRef.current) {
         spawnAccumRef.current = 0
-        nextSpawnRef.current = 2000 + Math.random() * 2000
+        nextSpawnRef.current = spawnInterval + Math.random() * 1000
         spawnAsteroid()
       }
 
       const treeRect = getTreeRect()
       const asteroids = asteroidsRef.current
       const removedAsteroids: number[] = []
+      let bulletDestroyed = false
 
       for (let i = asteroids.length - 1; i >= 0; i--) {
         const a = asteroids[i]
@@ -305,6 +398,9 @@ export function TechnicalMatrix() {
 
         if (bulletHit) {
           createPopEffect(a.x, a.y)
+          spawnParticles(a.x, a.y)
+          setScore((s) => s + 1)
+          bulletDestroyed = true
           removedAsteroids.push(a.id)
           continue
         }
@@ -319,6 +415,8 @@ export function TechnicalMatrix() {
             a.y - halfSize < treeRect.bottom
           ) {
             removedAsteroids.push(a.id)
+            setShaking(true)
+            setTimeout(() => setShaking(false), 300)
             handleHit()
             continue
           }
@@ -338,6 +436,29 @@ export function TechnicalMatrix() {
         forceRender((v) => v + 1)
       }
 
+      // Update particles
+      const particles = particlesRef.current
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i]
+        p.x += p.vx
+        p.y += p.vy
+        p.life--
+
+        const pel = particleElsRef.current.get(p.id)
+        if (pel) {
+          pel.style.left = `${p.x}px`
+          pel.style.top = `${p.y}px`
+          pel.style.opacity = `${Math.max(0, p.life / p.maxLife)}`
+        }
+
+        if (p.life <= 0) {
+          const pel2 = particleElsRef.current.get(p.id)
+          if (pel2) pel2.remove()
+          particleElsRef.current.delete(p.id)
+          particles.splice(i, 1)
+        }
+      }
+
       rafId = requestAnimationFrame(tick)
     }
 
@@ -345,20 +466,50 @@ export function TechnicalMatrix() {
     return () => {
       cancelAnimationFrame(rafId)
     }
-  }, [hp, spawnAsteroid, getTreeRect, handleHit, createPopEffect])
+  }, [hp, spawnAsteroid, getTreeRect, handleHit, createPopEffect, spawnParticles])
 
   const reset = () => {
     setHp(3)
+    setScore(0)
+    setWave(1)
+    setWaveFlash(null)
+    setShaking(false)
     glitchedRef.current = new Set()
+    totalTimeRef.current = 0
+    prevWaveRef.current = 1
+    asteroidSpeedRef.current = ASTEROID_SPEEDS[0]
+    // Clear any lingering particles
+    particleElsRef.current.forEach((el) => el.remove())
+    particleElsRef.current.clear()
+    particlesRef.current = []
+    if (waveFlashTimeoutRef.current) clearTimeout(waveFlashTimeoutRef.current)
+    gameRunningRef.current = true
     forceRender((v) => v + 1)
   }
 
   const isCorrupted = hp <= 0
 
   return (
-    <section id="matrix" className="relative px-6 md:px-12 lg:px-20 py-20 md:py-28">
+    <section id="matrix" className="relative px-6 md:px-12 lg:px-20 py-20 md:py-28 overflow-hidden">
+      {/* Shake animation keyframes */}
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-4px); }
+          75% { transform: translateX(4px); }
+        }
+        @keyframes fadeOut {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        .shake {
+          animation: shake 0.3s ease-in-out;
+        }
+      `}</style>
       {/* Asteroid container for game asteroids */}
       <div ref={asteroidContainerRef} aria-hidden />
+      {/* Particles container */}
+      <div ref={particlesContainerRef} aria-hidden />
 
       {/* Game directions button */}
       <button
@@ -410,7 +561,7 @@ export function TechnicalMatrix() {
       {/* Terminal-style container with CRT scan lines */}
       <div
         id="matrix-card"
-        className="border border-border bg-card rounded-sm overflow-hidden max-w-xl mx-auto relative"
+        className={`border border-border bg-card rounded-sm overflow-hidden w-full relative${shaking ? ' shake' : ''}`}
       >
         {/* CRT scan line overlay */}
         <div
@@ -453,7 +604,7 @@ export function TechnicalMatrix() {
           </div>
         ) : (
           <div className="p-6 md:p-8">
-            <div className="font-mono text-sm leading-relaxed">
+            <div className="font-mono text-sm leading-relaxed mx-auto max-w-2xl">
               {treeLines.map((line, idx) => {
                 const isGlitched = glitchedRef.current.has(idx)
                 let textClass = 'text-foreground'
@@ -473,6 +624,18 @@ export function TechnicalMatrix() {
           </div>
         )}
 
+        {/* Wave flash overlay */}
+        {waveFlash && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+            <span
+              className="font-mono text-lg font-bold text-accent"
+              style={{ animation: 'fadeOut 2s ease-out forwards' }}
+            >
+              {waveFlash}
+            </span>
+          </div>
+        )}
+
         {/* Terminal footer */}
         <div className="px-6 py-3 bg-secondary/30 border-t border-border">
           <div className="font-mono text-xs text-muted-foreground">
@@ -484,10 +647,15 @@ export function TechnicalMatrix() {
             </span>{' '}
             | {treeLines.length} nodes
             {!isCorrupted && (
-              <span className="ml-3 text-muted-foreground/50">
-                | HP: {'■'.repeat(hp)}
-                {'□'.repeat(3 - hp)}
-              </span>
+              <>
+                <span className="ml-3 text-muted-foreground/50">
+                  | SCORE: {score}
+                </span>
+                <span className="ml-3 text-muted-foreground/50">
+                  | HP: {'■'.repeat(hp)}
+                  {'□'.repeat(3 - hp)}
+                </span>
+              </>
             )}
           </div>
         </div>
