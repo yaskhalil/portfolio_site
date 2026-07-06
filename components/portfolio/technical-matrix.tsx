@@ -91,15 +91,7 @@ function garbleChar(): string {
   return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]
 }
 
-function garbleText(text: string): string {
-  return text
-    .split('')
-    .map((char) => {
-      if (/[\s\/│├└─]/.test(char)) return char
-      return Math.random() < 0.45 ? garbleChar() : char
-    })
-    .join('')
-}
+
 
 type Asteroid = {
   id: number
@@ -127,6 +119,9 @@ const SPAWN_INTERVALS = [4000, 3000, 2000]
 export function TechnicalMatrix() {
   const [hp, setHp] = useState(3)
   const glitchedRef = useRef<Set<number>>(new Set())
+  const [glitchTick, setGlitchTick] = useState(0)
+  const glitchCharRatesRef = useRef<Map<string, number[]>>(new Map())
+  const glitchDisplayRef = useRef<Map<string, string[]>>(new Map())
   const [, forceRender] = useState(0)
   const [showDirections, setShowDirections] = useState(false)
   const [score, setScore] = useState(0)
@@ -482,6 +477,16 @@ export function TechnicalMatrix() {
     }
   }, [hp, spawnAsteroid, getTreeRect, handleHit, createPopEffect, spawnParticles])
 
+  // Glitch tick interval — 30ms tick when glitched branches exist and game is alive
+  useEffect(() => {
+    if (glitchedRef.current.size > 0 && hp > 0) {
+      const id = setInterval(() => {
+        setGlitchTick((t) => t + 1)
+      }, 30)
+      return () => clearInterval(id)
+    }
+  }, [hp])
+
   const reset = () => {
     setHp(3)
     setScore(0)
@@ -489,6 +494,9 @@ export function TechnicalMatrix() {
     setWaveFlash(null)
     setShaking(false)
     glitchedRef.current = new Set()
+    glitchCharRatesRef.current = new Map()
+    glitchDisplayRef.current = new Map()
+    setGlitchTick(0)
     totalTimeRef.current = 0
     prevWaveRef.current = 1
     asteroidSpeedRef.current = ASTEROID_SPEEDS[0]
@@ -502,6 +510,29 @@ export function TechnicalMatrix() {
   }
 
   const isCorrupted = hp <= 0
+
+  function renderGlitchedText(name: string, lineIdx: number, tick: number): string {
+    const key = String(lineIdx)
+    if (!glitchCharRatesRef.current.has(key)) {
+      const chars = name.split('')
+      const rates = chars.map((char) => {
+        if (/[\s\/│├└─]/.test(char)) return 0
+        return Math.random() < 0.5 ? 1 : 10
+      })
+      glitchCharRatesRef.current.set(key, rates)
+      glitchDisplayRef.current.set(key, [...chars])
+    }
+    const rates = glitchCharRatesRef.current.get(key)!
+    const display = glitchDisplayRef.current.get(key)!
+    name.split('').forEach((char, i) => {
+      if (/[\s\/│├└─]/.test(char)) return
+      const rate = rates[i]
+      if (rate > 0 && tick % rate === 0) {
+        display[i] = garbleChar()
+      }
+    })
+    return display.join('')
+  }
 
   return (
     <section id="matrix" className="relative px-6 md:px-12 lg:px-20 py-20 md:py-28 overflow-hidden">
@@ -629,7 +660,7 @@ export function TechnicalMatrix() {
                 if (line.isRoot) textClass = 'text-primary'
                 else if (line.isCategory) textClass = 'text-accent'
 
-                const displayName = isGlitched ? garbleText(line.name) : line.name
+                const displayName = isGlitched ? renderGlitchedText(line.name, idx, glitchTick) : line.name
 
                 return (
                   <div key={idx} className="leading-relaxed whitespace-pre">
