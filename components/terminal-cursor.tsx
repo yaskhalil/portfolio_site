@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 
+export const bulletData: { x: number; y: number; vx: number; vy: number }[] = []
+
 export default function TerminalCursor() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const posRef = useRef({ x: 0, y: 0 })
@@ -116,31 +118,12 @@ export default function TerminalCursor() {
 
       ctx.restore()
 
-      // Hit detection for tech tree (#matrix)
-      const matrixEl = document.getElementById('matrix')
-      const matrixRect = matrixEl?.getBoundingClientRect()
-
       // Update and draw bullets
       const bullets = bulletsRef.current
       for (let i = bullets.length - 1; i >= 0; i--) {
         const b = bullets[i]
         b.x += b.vx
         b.y += b.vy
-
-        // Check if bullet hit the tech tree section
-        if (
-          matrixRect &&
-          b.x >= matrixRect.left &&
-          b.x <= matrixRect.right &&
-          b.y >= matrixRect.top &&
-          b.y <= matrixRect.bottom
-        ) {
-          bullets.splice(i, 1)
-          window.dispatchEvent(
-            new CustomEvent('tree-hit', { detail: { x: b.x, y: b.y } })
-          )
-          continue
-        }
 
         b.life--
         if (b.life <= 0) {
@@ -155,6 +138,12 @@ export default function TerminalCursor() {
         ctx.fillStyle = '#facc15'
         ctx.fill()
       }
+
+      // Sync bullet positions for game collision detection
+      bulletData.length = 0
+      bullets.forEach((b) =>
+        bulletData.push({ x: b.x, y: b.y, vx: b.vx, vy: b.vy })
+      )
 
       canvas.style.transform = `translate(${cur.x - SIZE / 2}px, ${cur.y - SIZE / 2}px)`
       rafId = requestAnimationFrame(tick)

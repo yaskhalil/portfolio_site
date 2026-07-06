@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { bulletData } from '../terminal-cursor'
 
 type TreeNode = {
   name: string
@@ -8,50 +9,50 @@ type TreeNode = {
 }
 
 const rootTree: TreeNode = {
-  name: "active-stack/",
+  name: 'active-stack/',
   children: [
     {
-      name: "modeling/",
+      name: 'modeling/',
       children: [
-        { name: "python" },
-        { name: "pytorch" },
-        { name: "numpy" },
-        { name: "gnn" },
-        { name: "stp-algebra" },
+        { name: 'python' },
+        { name: 'pytorch' },
+        { name: 'numpy' },
+        { name: 'gnn' },
+        { name: 'stp-algebra' },
       ],
     },
     {
-      name: "backend/",
+      name: 'backend/',
       children: [
-        { name: "go" },
-        { name: "fastapi" },
-        { name: "postgres" },
-        { name: "kdb-q" },
+        { name: 'go' },
+        { name: 'fastapi' },
+        { name: 'postgres' },
+        { name: 'kdb-q' },
       ],
     },
     {
-      name: "frontend/",
+      name: 'frontend/',
       children: [
-        { name: "typescript" },
-        { name: "react" },
-        { name: "tailwind" },
-        { name: "nextjs" },
+        { name: 'typescript' },
+        { name: 'react' },
+        { name: 'tailwind' },
+        { name: 'nextjs' },
       ],
     },
     {
-      name: "research/",
+      name: 'research/',
       children: [
-        { name: "r" },
-        { name: "depmap" },
-        { name: "systems-biology" },
+        { name: 'r' },
+        { name: 'depmap' },
+        { name: 'systems-biology' },
       ],
     },
     {
-      name: "infra/",
+      name: 'infra/',
       children: [
-        { name: "docker" },
-        { name: "vercel" },
-        { name: "supabase" },
+        { name: 'docker' },
+        { name: 'vercel' },
+        { name: 'supabase' },
       ],
     },
   ],
@@ -65,17 +66,15 @@ type TreeLine = {
 }
 
 function flattenTree(node: TreeNode, prefix: string, isLast: boolean, depth: number): TreeLine[] {
-  const branchChar = isLast ? "└── " : "├── "
+  const branchChar = isLast ? '└── ' : '├── '
   const linePrefix = prefix + branchChar
   const isRoot = depth === 0
   const isCategory = !!node.children
 
-  const lines: TreeLine[] = [
-    { name: node.name, prefix: linePrefix, isRoot, isCategory },
-  ]
+  const lines: TreeLine[] = [{ name: node.name, prefix: linePrefix, isRoot, isCategory }]
 
   if (node.children) {
-    const childPrefix = prefix + (isLast ? "    " : "│   ")
+    const childPrefix = prefix + (isLast ? '    ' : '│   ')
     node.children.forEach((child, i) => {
       lines.push(
         ...flattenTree(child, childPrefix, i === node.children!.length - 1, depth + 1)
@@ -96,39 +95,257 @@ function garbleText(text: string): string {
   return text
     .split('')
     .map((char) => {
-      // Keep tree-drawing characters, slashes, and spaces intact
       if (/[\s\/│├└─]/.test(char)) return char
       return Math.random() < 0.45 ? garbleChar() : char
     })
     .join('')
 }
 
+type Asteroid = {
+  id: number
+  x: number
+  y: number
+  vx: number
+  vy: number
+  size: number
+  rotation: number
+  rotationSpeed: number
+}
+
 export function TechnicalMatrix() {
   const [hp, setHp] = useState(3)
   const glitchedRef = useRef<Set<number>>(new Set())
   const [, forceRender] = useState(0)
+  const [showDirections, setShowDirections] = useState(false)
+
+  // Game state refs (mutable, no re-render)
+  const asteroidsRef = useRef<Asteroid[]>([])
+  const asteroidElsRef = useRef<Map<number, HTMLDivElement>>(new Map())
+  const asteroidContainerRef = useRef<HTMLDivElement>(null)
+  const asteroidIdRef = useRef(0)
+  const spawnAccumRef = useRef(0)
+  const nextSpawnRef = useRef(2000 + Math.random() * 2000)
+  const gameRunningRef = useRef(true)
 
   const treeLines = useMemo(() => flattenTree(rootTree, '', true, 0), [])
 
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail
-      setHp((h) => {
-        const next = Math.max(0, h - 1)
-        // When hit, add 2-3 random line indices to glitch set
-        const count = 2 + Math.floor(Math.random() * 2)
-        const nextGlitched = new Set(glitchedRef.current)
-        for (let i = 0; i < count; i++) {
-          nextGlitched.add(Math.floor(Math.random() * treeLines.length))
-        }
-        glitchedRef.current = nextGlitched
-        forceRender((v) => v + 1)
-        return next
-      })
-    }
-    window.addEventListener('tree-hit', handler)
-    return () => window.removeEventListener('tree-hit', handler)
+  const handleHit = useCallback(() => {
+    setHp((h) => {
+      const next = Math.max(0, h - 1)
+      const count = 2 + Math.floor(Math.random() * 2)
+      const nextGlitched = new Set(glitchedRef.current)
+      for (let i = 0; i < count; i++) {
+        nextGlitched.add(Math.floor(Math.random() * treeLines.length))
+      }
+      glitchedRef.current = nextGlitched
+      forceRender((v) => v + 1)
+      if (next <= 0) {
+        gameRunningRef.current = false
+      }
+      return next
+    })
   }, [treeLines.length])
+
+  const getTreeRect = useCallback(() => {
+    return document.getElementById('matrix-card')?.getBoundingClientRect() ?? null
+  }, [])
+
+  const spawnAsteroid = useCallback(() => {
+    const treeRect = getTreeRect()
+    if (!treeRect) return
+
+    const side = Math.random() * 3
+    let x: number, y: number
+    const margin = 40 + Math.random() * 40
+
+    if (side < 1) {
+      // Left
+      x = treeRect.left - margin
+      y = treeRect.top + Math.random() * treeRect.height
+    } else if (side < 2) {
+      // Right
+      x = treeRect.right + margin
+      y = treeRect.top + Math.random() * treeRect.height
+    } else {
+      // Top
+      x = treeRect.left + Math.random() * treeRect.width
+      y = treeRect.top - margin
+    }
+
+    const cx = treeRect.left + treeRect.width / 2
+    const cy = treeRect.top + treeRect.height / 2
+    const dx = cx - x
+    const dy = cy - y
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    const speed = 1 + Math.random() * 1
+
+    const asteroid: Asteroid = {
+      id: asteroidIdRef.current++,
+      x,
+      y,
+      vx: (dx / dist) * speed,
+      vy: (dy / dist) * speed,
+      size: 12 + Math.random() * 8,
+      rotation: Math.random() * Math.PI * 2,
+      rotationSpeed: (Math.random() - 0.5) * 0.03,
+    }
+
+    asteroidsRef.current.push(asteroid)
+
+    // Create DOM element
+    const el = document.createElement('div')
+    el.style.cssText = `
+      position: fixed;
+      left: ${asteroid.x}px;
+      top: ${asteroid.y}px;
+      width: ${asteroid.size}px;
+      height: ${asteroid.size}px;
+      background-color: #22d3ee;
+      opacity: 0.6;
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      transform: translate(-50%, -50%) rotate(${asteroid.rotation}rad);
+      z-index: 50;
+      pointer-events: none;
+    `
+    asteroidContainerRef.current?.appendChild(el)
+    asteroidElsRef.current.set(asteroid.id, el)
+
+    forceRender((v) => v + 1)
+  }, [getTreeRect])
+
+  const createPopEffect = useCallback((x: number, y: number) => {
+    const el = document.createElement('div')
+    el.style.cssText = `
+      position: fixed;
+      left: ${x}px;
+      top: ${y}px;
+      width: 24px;
+      height: 24px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, #22d3ee 0%, rgba(34,211,238,0.3) 50%, transparent 70%);
+      border-radius: 50%;
+      z-index: 60;
+      pointer-events: none;
+      transition: all 0.25s ease-out;
+    `
+    document.body.appendChild(el)
+    requestAnimationFrame(() => {
+      el.style.transform = 'translate(-50%, -50%) scale(2.5)'
+      el.style.opacity = '0'
+    })
+    setTimeout(() => el.remove(), 250)
+  }, [])
+
+  // Game loop
+  useEffect(() => {
+    if (hp <= 0) {
+      gameRunningRef.current = false
+      // Clear remaining asteroid DOM elements
+      asteroidElsRef.current.forEach((el) => el.remove())
+      asteroidElsRef.current.clear()
+      asteroidsRef.current = []
+      return
+    }
+
+    gameRunningRef.current = true
+    let rafId: number
+    let prevTime = 0
+
+    const tick = (time: number) => {
+      if (!gameRunningRef.current) {
+        cancelAnimationFrame(rafId)
+        return
+      }
+
+      const dt = prevTime ? time - prevTime : 16
+      prevTime = time
+
+      // Spawn timer
+      spawnAccumRef.current += dt
+      if (spawnAccumRef.current >= nextSpawnRef.current) {
+        spawnAccumRef.current = 0
+        nextSpawnRef.current = 2000 + Math.random() * 2000
+        spawnAsteroid()
+      }
+
+      const treeRect = getTreeRect()
+      const asteroids = asteroidsRef.current
+      const removedAsteroids: number[] = []
+
+      for (let i = asteroids.length - 1; i >= 0; i--) {
+        const a = asteroids[i]
+
+        // Skip already-removed
+        if (removedAsteroids.includes(a.id)) continue
+
+        // Move
+        a.x += a.vx
+        a.y += a.vy
+        a.rotation += a.rotationSpeed
+
+        // Update DOM element
+        const el = asteroidElsRef.current.get(a.id)
+        if (el) {
+          el.style.left = `${a.x}px`
+          el.style.top = `${a.y}px`
+          el.style.transform = `translate(-50%, -50%) rotate(${a.rotation}rad)`
+        }
+
+        // Bullet-asteroid collision
+        let bulletHit = false
+        for (let bi = 0; bi < bulletData.length; bi++) {
+          const b = bulletData[bi]
+          const dx = b.x - a.x
+          const dy = b.y - a.y
+          if (Math.sqrt(dx * dx + dy * dy) < 15) {
+            bulletHit = true
+            break
+          }
+        }
+
+        if (bulletHit) {
+          createPopEffect(a.x, a.y)
+          removedAsteroids.push(a.id)
+          continue
+        }
+
+        // Asteroid-tree collision
+        if (treeRect) {
+          const halfSize = a.size / 2
+          if (
+            a.x + halfSize > treeRect.left &&
+            a.x - halfSize < treeRect.right &&
+            a.y + halfSize > treeRect.top &&
+            a.y - halfSize < treeRect.bottom
+          ) {
+            removedAsteroids.push(a.id)
+            handleHit()
+            continue
+          }
+        }
+      }
+
+      // Remove destroyed asteroids
+      if (removedAsteroids.length > 0) {
+        asteroidsRef.current = asteroids.filter((a) => !removedAsteroids.includes(a.id))
+        removedAsteroids.forEach((id) => {
+          const el = asteroidElsRef.current.get(id)
+          if (el) {
+            el.remove()
+            asteroidElsRef.current.delete(id)
+          }
+        })
+        forceRender((v) => v + 1)
+      }
+
+      rafId = requestAnimationFrame(tick)
+    }
+
+    rafId = requestAnimationFrame(tick)
+    return () => {
+      cancelAnimationFrame(rafId)
+    }
+  }, [hp, spawnAsteroid, getTreeRect, handleHit, createPopEffect])
 
   const reset = () => {
     setHp(3)
@@ -136,47 +353,49 @@ export function TechnicalMatrix() {
     forceRender((v) => v + 1)
   }
 
-  // Generate 6 random asteroid positions/animation params (stable across renders)
-  const asteroids = useMemo(() => {
-    return Array.from({ length: 6 }, (_, i) => ({
-      left: 3 + Math.random() * 94,
-      top: 2 + Math.random() * 96,
-      dur: 10 + Math.random() * 5,
-      dx: -50 + Math.random() * 100,
-      dy: -50 + Math.random() * 100,
-      delay: Math.random() * 5,
-      key: i,
-    }))
-  }, [])
-
   const isCorrupted = hp <= 0
 
   return (
-    <section
-      id="matrix"
-      className="relative px-6 md:px-12 lg:px-20 py-20 md:py-28"
-    >
-      {/* Asteroids — only visible when HP > 0 */}
-      {hp > 0 &&
-        asteroids.map((a) => (
+    <section id="matrix" className="relative px-6 md:px-12 lg:px-20 py-20 md:py-28">
+      {/* Asteroid container for game asteroids */}
+      <div ref={asteroidContainerRef} aria-hidden />
+
+      {/* Game directions button */}
+      <button
+        onClick={() => setShowDirections((v) => !v)}
+        className="absolute top-6 right-6 md:top-8 md:right-12 lg:right-20 z-10 w-6 h-6 rounded-full border border-border flex items-center justify-center text-xs font-mono text-muted-foreground opacity-40 hover:opacity-80 transition-opacity cursor-pointer"
+        aria-label="Game directions"
+      >
+        ?
+      </button>
+
+      {/* Directions popup */}
+      {showDirections && (
+        <div
+          className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/40"
+          onClick={() => setShowDirections(false)}
+        >
           <div
-            key={a.key}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${a.left}%`,
-              top: `${a.top}%`,
-              width: 8,
-              height: 8,
-              backgroundColor: '#22d3ee',
-              opacity: 0.4,
-              clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
-              animation: `asteroid-drift ${a.dur}s linear ${a.delay}s infinite alternate`,
-              '--dx': `${a.dx}px`,
-              '--dy': `${a.dy}px`,
-            } as React.CSSProperties}
-            aria-hidden
-          />
-        ))}
+            className="bg-card border border-border rounded-sm p-6 max-w-sm mx-4 font-mono text-sm text-foreground"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="font-bold text-lg mb-3 text-accent">DEFEND THE TECH TREE</div>
+            <p className="mb-2 text-muted-foreground">
+              Asteroids are drifting toward your skill tree.
+            </p>
+            <p className="mb-2 text-muted-foreground">
+              Shoot them down with your ship&apos;s guns.
+            </p>
+            <p className="mb-4 text-muted-foreground">Survive as long as you can.</p>
+            <button
+              onClick={() => setShowDirections(false)}
+              className="w-full py-2 border border-accent/50 text-accent hover:bg-accent/10 transition-colors rounded-sm cursor-pointer text-xs"
+            >
+              [CLICK TO DISMISS]
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Section Header */}
       <div className="mb-10 md:mb-14">
@@ -189,7 +408,10 @@ export function TechnicalMatrix() {
       </div>
 
       {/* Terminal-style container with CRT scan lines */}
-      <div className="border border-border bg-card rounded-sm overflow-hidden max-w-xl mx-auto relative">
+      <div
+        id="matrix-card"
+        className="border border-border bg-card rounded-sm overflow-hidden max-w-xl mx-auto relative"
+      >
         {/* CRT scan line overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -213,9 +435,7 @@ export function TechnicalMatrix() {
           <div className="w-3 h-3 rounded-full bg-destructive/50" />
           <div className="w-3 h-3 rounded-full bg-accent/50" />
           <div className="w-3 h-3 rounded-full bg-primary/50" />
-          <span className="ml-4 font-mono text-xs text-muted-foreground">
-            tree
-          </span>
+          <span className="ml-4 font-mono text-xs text-muted-foreground">tree</span>
         </div>
 
         {/* Tree content — normal or corrupted */}
@@ -272,36 +492,6 @@ export function TechnicalMatrix() {
           </div>
         </div>
       </div>
-
-      {/* Asteroid drift keyframes injected once */}
-      <style jsx>{`
-        @keyframes asteroid-drift {
-          0% {
-            transform: translate(0, 0);
-          }
-          25% {
-            transform: translate(var(--dx), var(--dy));
-          }
-          50% {
-            transform: translate(
-              calc(var(--dx) * 1.2),
-              calc(var(--dy) * -0.6)
-            );
-          }
-          75% {
-            transform: translate(
-              calc(var(--dx) * -0.4),
-              calc(var(--dy) * 0.8)
-            );
-          }
-          100% {
-            transform: translate(
-              calc(var(--dx) * 0.3),
-              calc(var(--dy) * -1.1)
-            );
-          }
-        }
-      `}</style>
     </section>
   )
 }
