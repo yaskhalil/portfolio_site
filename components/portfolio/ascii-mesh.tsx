@@ -634,10 +634,7 @@ export function AsciiMesh() {
     window.addEventListener("mousemove", onMouse)
 
     const onScroll = () => {
-      const sy = window.scrollY || 0
-      const prev = (window as any).__lastScrollY || 0
-      scrollRef.current = Math.min(5, Math.abs(sy - prev) / 100)
-      ;(window as any).__lastScrollY = sy
+      scrollRef.current = 3.0  // impulse on scroll, decays in draw loop
     }
     window.addEventListener("scroll", onScroll, { passive: true })
 
