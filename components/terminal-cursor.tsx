@@ -116,12 +116,32 @@ export default function TerminalCursor() {
 
       ctx.restore()
 
+      // Hit detection for tech tree (#matrix)
+      const matrixEl = document.getElementById('matrix')
+      const matrixRect = matrixEl?.getBoundingClientRect()
+
       // Update and draw bullets
       const bullets = bulletsRef.current
       for (let i = bullets.length - 1; i >= 0; i--) {
         const b = bullets[i]
         b.x += b.vx
         b.y += b.vy
+
+        // Check if bullet hit the tech tree section
+        if (
+          matrixRect &&
+          b.x >= matrixRect.left &&
+          b.x <= matrixRect.right &&
+          b.y >= matrixRect.top &&
+          b.y <= matrixRect.bottom
+        ) {
+          bullets.splice(i, 1)
+          window.dispatchEvent(
+            new CustomEvent('tree-hit', { detail: { x: b.x, y: b.y } })
+          )
+          continue
+        }
+
         b.life--
         if (b.life <= 0) {
           bullets.splice(i, 1)
