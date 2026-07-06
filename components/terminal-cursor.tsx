@@ -30,14 +30,10 @@ export default function TerminalCursor() {
       e.preventDefault()
       const cur = posRef.current
 
-      // Use the ship's current visual rotation (lastAngleRef) for bullet direction
       let angle = lastAngleRef.current
-
-      // Slight random spread — keep ±0.3 rad
       angle += (Math.random() - 0.5) * SPREAD * 2
 
       const bullets = bulletsRef.current
-      // Drop oldest if at max
       while (bullets.length >= MAX_BULLETS) {
         bullets.shift()
       }
@@ -53,7 +49,13 @@ export default function TerminalCursor() {
 
     const canvas = canvasRef.current!
     const ctx = canvas.getContext('2d')!
-    const SIZE = 60
+
+    const resize = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+    }
+    resize()
+    window.addEventListener('resize', resize)
 
     let rafId: number
     const tick = () => {
@@ -74,9 +76,11 @@ export default function TerminalCursor() {
       cur.x += (tgt.x - cur.x) * 0.15
       cur.y += (tgt.y - cur.y) * 0.15
 
-      ctx.clearRect(0, 0, SIZE, SIZE)
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      // Draw ship at absolute cursor position
       ctx.save()
-      ctx.translate(SIZE / 2, SIZE / 2)
+      ctx.translate(cur.x, cur.y)
 
       // Compute rotation angle from velocity; fall back to last angle when stationary
       if (speed > 0.5) {
@@ -91,7 +95,7 @@ export default function TerminalCursor() {
         const f = Math.random() * 10
 
         // Three-layer flame: red → orange → yellow (scaled up)
-        for (const [w, m, c] of [[10, 1, '#ef4444'], [7, 0.65, '#f97316'], [4, 0.4, '#facc15']]) {
+        for (const [w, m, c] of [[10, 1, '#ef4444'], [7, 0.65, '#f97316'], [4, 0.4, '#facc15']] as const) {
           ctx.beginPath()
           ctx.moveTo(-w, 10)
           ctx.lineTo(0, 8 + (flameLen + f) * m)
@@ -148,24 +152,20 @@ export default function TerminalCursor() {
           continue
         }
 
-        // Bullet position relative to canvas
-        const bx = b.x - (cur.x - SIZE / 2)
-        const by = b.y - (cur.y - SIZE / 2)
-
-        // Draw comet trail: 3 circles along velocity direction
+        // Draw comet trail: 2 circles along velocity direction
         const dx = b.vx / BULLET_SPEED
         const dy = b.vy / BULLET_SPEED
-        const trailOpacities = [0.3, 0.6]
+        const trailOpacities = [0.5, 0.8]
         for (let t = 0; t < trailOpacities.length; t++) {
           const tb = t + 1
           ctx.beginPath()
-          ctx.arc(bx - dx * tb * 4, by - dy * tb * 4, 2, 0, Math.PI * 2)
+          ctx.arc(b.x - dx * tb * 6, b.y - dy * tb * 6, 2, 0, Math.PI * 2)
           ctx.fillStyle = `rgba(250, 204, 21, ${trailOpacities[t]})`
           ctx.fill()
         }
         // Main bullet
         ctx.beginPath()
-        ctx.arc(bx, by, 2.5, 0, Math.PI * 2)
+        ctx.arc(b.x, b.y, 2.5, 0, Math.PI * 2)
         ctx.fillStyle = '#facc15'
         ctx.fill()
       }
@@ -176,7 +176,6 @@ export default function TerminalCursor() {
         bulletData.push({ x: b.x, y: b.y, vx: b.vx, vy: b.vy })
       )
 
-      canvas.style.transform = `translate(${cur.x - SIZE / 2}px, ${cur.y - SIZE / 2}px)`
       rafId = requestAnimationFrame(tick)
     }
     rafId = requestAnimationFrame(tick)
@@ -185,6 +184,7 @@ export default function TerminalCursor() {
       style.remove()
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('resize', resize)
       cancelAnimationFrame(rafId)
     }
   }, [])
@@ -192,8 +192,6 @@ export default function TerminalCursor() {
   return (
     <canvas
       ref={canvasRef}
-      width={60}
-      height={60}
       className="pointer-events-none fixed left-0 top-0 z-[9999]"
       aria-hidden
     />

@@ -335,6 +335,21 @@ export function TechnicalMatrix() {
       const dt = prevTime ? time - prevTime : 16
       prevTime = time
 
+      // Skip game state updates when #matrix section is scrolled out of view
+      const matrixEl = document.getElementById('matrix')
+      if (matrixEl) {
+        const rect = matrixEl.getBoundingClientRect()
+        const isVisible =
+          rect.bottom > 0 &&
+          rect.top < window.innerHeight &&
+          rect.right > 0 &&
+          rect.left < window.innerWidth
+        if (!isVisible) {
+          rafId = requestAnimationFrame(tick)
+          return
+        }
+      }
+
       // Wave escalation — every 15s of cumulative runtime
       totalTimeRef.current += dt
       const newWave = Math.floor(totalTimeRef.current / 15000) + 1
