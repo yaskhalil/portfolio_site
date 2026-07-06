@@ -3,19 +3,15 @@
 import { useEffect, useRef } from 'react'
 
 export default function TerminalCursor() {
-  const cursorRef = useRef<HTMLSpanElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const posRef = useRef({ x: 0, y: 0 })
   const targetRef = useRef({ x: 0, y: 0 })
+  const prevPosRef = useRef({ x: 0, y: 0 })
+  const bulletsRef = useRef<{ x: number; y: number; vx: number; vy: number; life: number }[]>([])
 
   useEffect(() => {
     const style = document.createElement('style')
-    style.textContent = `
-      body { cursor: none !important; }
-      @keyframes terminal-blink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0; }
-      }
-    `
+    style.textContent = `body { cursor: none !important; }`
     document.head.appendChild(style)
 
     const onMouseMove = (e: MouseEvent) => {
@@ -23,17 +19,130 @@ export default function TerminalCursor() {
     }
     window.addEventListener('mousemove', onMouseMove)
 
+    const BULLET_SPEED = 9
+    const BULLET_LIFE = 60
+    const MAX_BULLETS = 20
+    const SPREAD = 0.3
+
+    const onMouseDown = (e: MouseEvent) => {
+      e.preventDefault()
+      const cur = posRef.current
+      const prev = prevPosRef.current
+      const vx = cur.x - prev.x
+      const vy = cur.y - prev.y
+      const speed = Math.sqrt(vx * vx + vy * vy)
+
+      let angle: number
+      if (speed < 0.5) {
+        angle = -Math.PI / 2
+      } else {
+        angle = Math.atan2(vy, vx) + Math.PI / 2
+      }
+
+      // Slight random spread
+      angle += (Math.random() - 0.5) * SPREAD * 2
+
+      const bullets = bulletsRef.current
+      // Drop oldest if at max
+      while (bullets.length >= MAX_BULLETS) {
+        bullets.shift()
+      }
+
+      bullets.push({
+        x: cur.x,
+        y: cur.y,
+        vx: Math.cos(angle - Math.PI / 2) * BULLET_SPEED,
+        vy: Math.sin(angle - Math.PI / 2) * BULLET_SPEED,
+        life: BULLET_LIFE,
+      })
+    }
+    window.addEventListener('mousedown', onMouseDown)
+
+    const canvas = canvasRef.current!
+    const ctx = canvas.getContext('2d')!
+    const SIZE = 60
+
     let rafId: number
     const tick = () => {
       const cur = posRef.current
+      const prev = prevPosRef.current
       const tgt = targetRef.current
-      // lerp toward target for smooth following
+
+      // Velocity from previous frame's position delta
+      const vx = cur.x - prev.x
+      const vy = cur.y - prev.y
+      const speed = Math.sqrt(vx * vx + vy * vy)
+
+      // Store current as previous before updating
+      prev.x = cur.x
+      prev.y = cur.y
+
+      // Lerp toward target (0.15 interpolation)
       cur.x += (tgt.x - cur.x) * 0.15
       cur.y += (tgt.y - cur.y) * 0.15
 
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate(${cur.x}px, ${cur.y}px)`
+      ctx.clearRect(0, 0, SIZE, SIZE)
+      ctx.save()
+      ctx.translate(SIZE / 2, SIZE / 2)
+
+      // Rotate ship to face velocity direction; point up when stationary
+      if (speed > 0.5) {
+        ctx.rotate(Math.atan2(vy, vx) + Math.PI / 2)
       }
+
+      // Speed flame — proportional to velocity, with random flicker
+      if (speed > 30) {
+        const t = Math.min(speed / 250, 1)
+        const flameLen = t * 16 + 2
+        const f = Math.random() * 6
+
+        // Three-layer flame: red → orange → yellow
+        for (const [w, m, c] of [[7, 1, '#ef4444'], [5, 0.65, '#f97316'], [3, 0.4, '#facc15']]) {
+          ctx.beginPath()
+          ctx.moveTo(-w, 10)
+          ctx.lineTo(0, 8 + (flameLen + f) * m)
+          ctx.lineTo(w, 10)
+          ctx.closePath()
+          ctx.fillStyle = c
+          ctx.fill()
+        }
+      }
+
+      // Ship body — retro triangle
+      ctx.beginPath()
+      ctx.moveTo(0, -14)
+      ctx.lineTo(-9, 10)
+      ctx.lineTo(9, 10)
+      ctx.closePath()
+      ctx.fillStyle = '#22d3ee'
+      ctx.fill()
+      ctx.strokeStyle = '#0891b2'
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+
+      ctx.restore()
+
+      // Update and draw bullets
+      const bullets = bulletsRef.current
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i]
+        b.x += b.vx
+        b.y += b.vy
+        b.life--
+        if (b.life <= 0) {
+          bullets.splice(i, 1)
+          continue
+        }
+        // Bullet position relative to canvas
+        const bx = b.x - (cur.x - SIZE / 2)
+        const by = b.y - (cur.y - SIZE / 2)
+        ctx.beginPath()
+        ctx.arc(bx, by, 2.5, 0, Math.PI * 2)
+        ctx.fillStyle = '#facc15'
+        ctx.fill()
+      }
+
+      canvas.style.transform = `translate(${cur.x - SIZE / 2}px, ${cur.y - SIZE / 2}px)`
       rafId = requestAnimationFrame(tick)
     }
     rafId = requestAnimationFrame(tick)
@@ -41,24 +150,18 @@ export default function TerminalCursor() {
     return () => {
       style.remove()
       window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mousedown', onMouseDown)
       cancelAnimationFrame(rafId)
     }
   }, [])
 
   return (
-    <span
-      ref={cursorRef}
-      className="pointer-events-none fixed left-0 top-0 z-[9999] select-none"
-      style={{
-        fontFamily: 'Geist Mono, monospace',
-        fontSize: 20,
-        lineHeight: 1,
-        color: '#22d3ee',
-        animation: 'terminal-blink 530ms step-end infinite',
-      }}
+    <canvas
+      ref={canvasRef}
+      width={60}
+      height={60}
+      className="pointer-events-none fixed left-0 top-0 z-[9999]"
       aria-hidden
-    >
-      _
-    </span>
+    />
   )
 }
