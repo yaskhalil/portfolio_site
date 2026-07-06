@@ -459,9 +459,18 @@ export function AsciiMesh() {
   const startTimeRef = useRef<number>(0)
   const animRef = useRef<number | null>(null)
   const mouseRef = useRef({ x: 0.5, y: 0.5 })
+  const scrollRef = useRef(0)
 
-  const cols = 80
-  const rows = 40
+  // Responsive grid based on container size
+  function getGridSize(w: number, h: number) {
+    return {
+      cols: Math.max(40, Math.floor(w / 16)),
+      rows: Math.max(20, Math.floor(h / 20)),
+    }
+  }
+  const grid = getGridSize(typeof window !== 'undefined' ? window.innerWidth : 1200, typeof window !== 'undefined' ? window.innerHeight : 800)
+  const cols = grid.cols
+  const rows = grid.rows
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
