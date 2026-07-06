@@ -435,16 +435,15 @@ function renderGridToCanvas(
   rows: number,
   cellW: number,
   cellH: number,
-  hue: number
+  primaryColor: string,
+  mutedColor: string
 ) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  const primary = `hsl(${hue}, 100%, 60%)`
-  const muted = `hsla(${hue + 40}, 40%, 60%, 1)`
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const b = grid[y][x]
       const char = brightnessToChar(b)
-      ctx.fillStyle = b > 0.5 ? primary : muted
+      ctx.fillStyle = b > 0.5 ? primaryColor : mutedColor
       ctx.globalAlpha = 0.65 + b * 0.35
       const centerX = x * cellW + cellW / 2
       const centerY = y * cellH + cellH / 2
@@ -457,20 +456,10 @@ function renderGridToCanvas(
 export function AsciiMesh() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const startTimeRef = useRef<number>(0)
-  const animRef = useRef<number | null>(null)
-  const mouseRef = useRef({ x: 0.5, y: 0.5 })
-  const scrollRef = useRef(0)
+  const animationRef = useRef<number | null>(null)
 
-  // Responsive grid based on container size
-  function getGridSize(w: number, h: number) {
-    return {
-      cols: Math.max(40, Math.floor(w / 16)),
-      rows: Math.max(20, Math.floor(h / 20)),
-    }
-  }
-  const grid = getGridSize(typeof window !== 'undefined' ? window.innerWidth : 1200, typeof window !== 'undefined' ? window.innerHeight : 800)
-  const cols = grid.cols
-  const rows = grid.rows
+  const cols = 80
+  const rows = 40
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
@@ -499,10 +488,8 @@ export function AsciiMesh() {
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
 
-    // Subtle color shift from mouse
-    const mx = mouseRef.current.x
-    const my = mouseRef.current.y
-    const hueShift = Math.floor((mx - 0.5) * 30 + (t * 8) % 360)
+    const primaryColor = "rgb(0, 255, 229)"
+    const mutedColor = "rgba(138, 155, 174, 1)"
 
     const now = performance.now()
     if (startTimeRef.current === 0) startTimeRef.current = now
@@ -510,17 +497,13 @@ export function AsciiMesh() {
     const phase = (elapsed % CYCLE_DURATION_MS) / CYCLE_DURATION_MS
 
     const t = elapsed / 1000
-    // Scroll impulse: briefly accelerates morph when scrolling
-    const scrollBoost = scrollRef.current
-    scrollRef.current *= 0.92
-    const pulse = 0.5 + 0.5 * Math.sin(t * 2 + scrollBoost * 5)
+    const pulse = 0.5 + 0.5 * Math.sin(t * 2)
 
     // Star point positions (normalized 0-1)
     const starPoints: [number, number][] = []
     for (let i = 0; i < 5; i++) {
       const angle = (i / 5) * Math.PI * 2 - Math.PI / 2 + (t * 0.2)
-      const rad = 0.35 + (my - 0.5) * 0.06
-      starPoints.push([0.5 + rad * Math.cos(angle + (mx - 0.5) * 0.15), 0.5 + rad * Math.sin(angle)])
+      starPoints.push([0.5 + 0.35 * Math.cos(angle), 0.5 + 0.35 * Math.sin(angle)])
     }
     starPoints.push([0.5, 0.5])
 
@@ -610,38 +593,18 @@ export function AsciiMesh() {
       grid = blendGrids(circle, nodes, morphT)
     }
 
-    renderGridToCanvas(ctx, grid, cols, rows, cellW, cellH, hueShift)
+    renderGridToCanvas(ctx, grid, cols, rows, cellW, cellH, primaryColor, mutedColor)
   }, [])
 
   useEffect(() => {
     startTimeRef.current = 0
     const tick = () => {
       draw()
-      animRef.current = requestAnimationFrame(tick)
+      animationRef.current = requestAnimationFrame(tick)
     }
-    animRef.current = requestAnimationFrame(tick)
-
-    const onMouse = (e: MouseEvent) => {
-      const el = canvasRef.current
-      if (!el) return
-      const r = el.getBoundingClientRect()
-      if (r.width === 0) return
-      mouseRef.current = {
-        x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)),
-        y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)),
-      }
-    }
-    window.addEventListener("mousemove", onMouse)
-
-    const onScroll = () => {
-      scrollRef.current = 3.0  // impulse on scroll, decays in draw loop
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-
+    animationRef.current = requestAnimationFrame(tick)
     return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current)
-      window.removeEventListener("mousemove", onMouse)
-      window.removeEventListener("scroll", onScroll)
+      if (animationRef.current) cancelAnimationFrame(animationRef.current)
     }
   }, [draw])
 
