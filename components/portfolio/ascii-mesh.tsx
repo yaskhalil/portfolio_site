@@ -435,15 +435,16 @@ function renderGridToCanvas(
   rows: number,
   cellW: number,
   cellH: number,
-  primaryColor: string,
-  mutedColor: string
+  hue: number
 ) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  const primary = `hsl(${hue}, 100%, 60%)`
+  const muted = `hsla(${hue + 40}, 40%, 60%, 1)`
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const b = grid[y][x]
       const char = brightnessToChar(b)
-      ctx.fillStyle = b > 0.5 ? primaryColor : mutedColor
+      ctx.fillStyle = b > 0.5 ? primary : muted
       ctx.globalAlpha = 0.65 + b * 0.35
       const centerX = x * cellW + cellW / 2
       const centerY = y * cellH + cellH / 2
@@ -489,11 +490,9 @@ export function AsciiMesh() {
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
 
-    const primaryColor = "rgb(0, 255, 229)"
-    const mutedColor = "rgba(138, 155, 174, 1)"
+    // Subtle color shift from mouse
     const mx = mouseRef.current.x
     const my = mouseRef.current.y
-    // Subtle color shift from mouse
     const hueShift = Math.floor((mx - 0.5) * 30 + (t * 8) % 360)
 
     const now = performance.now()
@@ -599,7 +598,7 @@ export function AsciiMesh() {
       grid = blendGrids(circle, nodes, morphT)
     }
 
-    renderGridToCanvas(ctx, grid, cols, rows, cellW, cellH, primaryColor, mutedColor)
+    renderGridToCanvas(ctx, grid, cols, rows, cellW, cellH, hueShift)
   }, [])
 
   useEffect(() => {
