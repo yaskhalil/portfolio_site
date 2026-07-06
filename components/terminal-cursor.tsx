@@ -7,6 +7,7 @@ export default function TerminalCursor() {
   const posRef = useRef({ x: 0, y: 0 })
   const targetRef = useRef({ x: 0, y: 0 })
   const prevPosRef = useRef({ x: 0, y: 0 })
+  const lastAngleRef = useRef(-Math.PI / 2)
   const bulletsRef = useRef<{ x: number; y: number; vx: number; vy: number; life: number }[]>([])
 
   useEffect(() => {
@@ -27,19 +28,11 @@ export default function TerminalCursor() {
     const onMouseDown = (e: MouseEvent) => {
       e.preventDefault()
       const cur = posRef.current
-      const prev = prevPosRef.current
-      const vx = cur.x - prev.x
-      const vy = cur.y - prev.y
-      const speed = Math.sqrt(vx * vx + vy * vy)
 
-      let angle: number
-      if (speed < 0.5) {
-        angle = -Math.PI / 2
-      } else {
-        angle = Math.atan2(vy, vx) + Math.PI / 2
-      }
+      // Use the ship's current visual rotation (lastAngleRef) for bullet direction
+      let angle = lastAngleRef.current
 
-      // Slight random spread
+      // Slight random spread — keep ±0.3 rad
       angle += (Math.random() - 0.5) * SPREAD * 2
 
       const bullets = bulletsRef.current
@@ -85,19 +78,20 @@ export default function TerminalCursor() {
       ctx.save()
       ctx.translate(SIZE / 2, SIZE / 2)
 
-      // Rotate ship to face velocity direction; point up when stationary
+      // Compute rotation angle from velocity; fall back to last angle when stationary
       if (speed > 0.5) {
-        ctx.rotate(Math.atan2(vy, vx) + Math.PI / 2)
+        lastAngleRef.current = Math.atan2(vy, vx) + Math.PI / 2
       }
+      ctx.rotate(lastAngleRef.current)
 
       // Speed flame — proportional to velocity, with random flicker
-      if (speed > 30) {
+      if (speed > 15) {
         const t = Math.min(speed / 250, 1)
-        const flameLen = t * 16 + 2
-        const f = Math.random() * 6
+        const flameLen = t * 28 + 4
+        const f = Math.random() * 10
 
-        // Three-layer flame: red → orange → yellow
-        for (const [w, m, c] of [[7, 1, '#ef4444'], [5, 0.65, '#f97316'], [3, 0.4, '#facc15']]) {
+        // Three-layer flame: red → orange → yellow (scaled up)
+        for (const [w, m, c] of [[10, 1, '#ef4444'], [7, 0.65, '#f97316'], [4, 0.4, '#facc15']]) {
           ctx.beginPath()
           ctx.moveTo(-w, 10)
           ctx.lineTo(0, 8 + (flameLen + f) * m)
