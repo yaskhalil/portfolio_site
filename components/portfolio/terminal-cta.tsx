@@ -14,7 +14,7 @@ export function TerminalCTA() {
   }, [])
 
   return (
-    <footer className="px-6 md:px-12 lg:px-20 py-20 md:py-28 border-t border-border">
+    <footer id="research" className="px-6 md:px-12 lg:px-20 py-20 md:py-28 border-t border-border">
       {/* Terminal Container */}
       <div className="border border-border bg-card rounded-sm overflow-hidden max-w-4xl">
         {/* Terminal header */}

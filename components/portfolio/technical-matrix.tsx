@@ -55,7 +55,7 @@ const skills = [
 
 export function TechnicalMatrix() {
   return (
-    <section className="px-6 md:px-12 lg:px-20 py-20 md:py-28">
+    <section id="matrix" className="px-6 md:px-12 lg:px-20 py-20 md:py-28">
       {/* Section Header */}
       <div className="mb-10 md:mb-14">
         <div className="font-mono text-xs text-muted-foreground mb-2">
