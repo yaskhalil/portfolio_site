@@ -37,4 +37,8 @@ components/
 - Auto-deploys to Vercel on push
 
 ## Status
-Live. Blog posts are complete. Currently static — no future features planned unless new blog content is written.
+Live. Blog posts include Engineering a Cell series + The Idea of Insecurity. Blog index and homepage blog section now pull from shared `lib/blog-posts.ts`. Site deployed on Vercel (manual deploy, no Git auto-deploy yet). Git remote was migrated from `portfolio_sit` to `portfolio_site`.
+
+## To Do
+- [ ] Connect Vercel to GitHub for auto-deploy on push
+- [ ] Add iigma.im-inspired design polish (custom cursor, project carousel, terminal-style navigation)
