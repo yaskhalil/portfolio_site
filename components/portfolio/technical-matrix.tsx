@@ -1,5 +1,6 @@
 "use client"
 
+import SectionReveal from "@/components/section-reveal"
 
 const skills = [
   {
@@ -60,9 +61,11 @@ export function TechnicalMatrix() {
         <div className="font-mono text-xs text-muted-foreground mb-2">
           <span className="text-primary">$</span> cat ./technical_matrix
         </div>
-        <h2 className="text-2xl md:text-3xl font-sans font-bold text-foreground">
-          Technical Matrix
-        </h2>
+        <SectionReveal>
+          <h2 className="text-2xl md:text-3xl font-sans font-bold text-foreground">
+            Technical Matrix
+          </h2>
+        </SectionReveal>
       </div>
 
       {/* Terminal-style container */}

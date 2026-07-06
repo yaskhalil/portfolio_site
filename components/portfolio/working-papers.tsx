@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRef } from "react"
 import { GitCommit, Clock, ChevronDown, ChevronUp } from "lucide-react"
 import { blogPosts, postHashes } from "@/lib/blog-posts"
+import SectionReveal from "@/components/section-reveal"
 
 const publishedPosts = blogPosts.filter(p => p.status === "published")
 
@@ -40,9 +41,11 @@ export function WorkingPapers() {
         <div className="font-mono text-xs text-muted-foreground mb-2">
           <span className="text-primary">$</span> git log --blog --oneline
         </div>
-        <h2 className="text-2xl md:text-3xl font-sans font-bold text-foreground">
-          Blog
-        </h2>
+        <SectionReveal>
+          <h2 className="text-2xl md:text-3xl font-sans font-bold text-foreground">
+            Blog
+          </h2>
+        </SectionReveal>
         <p className="mt-3 font-mono text-sm text-muted-foreground">
           Published writing
         </p>
