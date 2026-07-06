@@ -2,10 +2,47 @@
 
 import Link from "next/link"
 import { AsciiMesh } from "./ascii-mesh"
+import { useState, useEffect } from "react"
 
 const MESH_CODE_HREF = "https://github.com/yaskhalil/portfolio_site/blob/main/components/portfolio/ascii-mesh.tsx"
 
+const SUBTITLE = "Exploring the mathematical architecture of intelligent systems. Bridging high-dimensional feature engineering with production data pipelines and autonomous AI integrations."
+
 export function Hero() {
+  const [text, setText] = useState("")
+  const [typing, setTyping] = useState(true)
+  const [cursor, setCursor] = useState(true)
+  const [blink, setBlink] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      let i = 0
+      const iv = setInterval(() => {
+        i++
+        setText(SUBTITLE.slice(0, i))
+        if (i >= SUBTITLE.length) {
+          clearInterval(iv)
+          setTyping(false)
+          setCursor(false)
+        }
+      }, 40)
+    }, 500)
+    return () => clearTimeout(t)
+  }, [])
+
+  useEffect(() => {
+    if (!typing) {
+      const iv = setInterval(() => setBlink(v => !v), 1000)
+      return () => clearInterval(iv)
+    }
+  }, [typing])
+
+  useEffect(() => {
+    if (!typing) return
+    const iv = setInterval(() => setCursor(v => !v), 530)
+    return () => clearInterval(iv)
+  }, [typing])
+
   return (
     <section className="relative">
       {/* ASCII mesh — morph cycle ~17.5s */}
@@ -55,8 +92,7 @@ export function Hero() {
           <span className="block md:inline">Computational Modeler &amp; ML Systems Architect</span>
         </h1>
         <p className="mt-6 md:mt-8 font-mono text-sm md:text-base text-muted-foreground max-w-3xl leading-relaxed">
-          <span className="text-primary">{'>'}</span> Exploring the mathematical architecture of intelligent systems. Bridging high-dimensional feature engineering with production data pipelines and autonomous AI integrations.
-
+          <span className="text-primary" style={{ opacity: typing ? 1 : (blink ? 1 : 0.3) }}>{'>'}</span> {text}{cursor && <span>_</span>}
         </p>
       </div>
     </section>
