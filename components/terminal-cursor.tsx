@@ -10,7 +10,7 @@ export default function TerminalCursor() {
   const targetRef = useRef({ x: 0, y: 0 })
   const prevPosRef = useRef({ x: 0, y: 0 })
   const lastAngleRef = useRef(-Math.PI / 2)
-  const bulletsRef = useRef<{ x: number; y: number; vx: number; vy: number; life: number }[]>([])
+  const bulletsRef = useRef<{ x: number; y: number; vx: number; vy: number }[]>([])
 
   useEffect(() => {
     const style = document.createElement('style')
@@ -22,8 +22,7 @@ export default function TerminalCursor() {
     }
     window.addEventListener('mousemove', onMouseMove)
 
-    const BULLET_SPEED = 14
-    const BULLET_LIFE = 100
+    const BULLET_SPEED = 25
     const MAX_BULLETS = 20
     const SPREAD = 0.3
 
@@ -48,7 +47,6 @@ export default function TerminalCursor() {
         y: cur.y,
         vx: Math.cos(angle - Math.PI / 2) * BULLET_SPEED,
         vy: Math.sin(angle - Math.PI / 2) * BULLET_SPEED,
-        life: BULLET_LIFE,
       })
     }
     window.addEventListener('mousedown', onMouseDown)
@@ -120,19 +118,52 @@ export default function TerminalCursor() {
 
       // Update and draw bullets
       const bullets = bulletsRef.current
+      const sectionEl = document.getElementById('matrix')
+      let sectionBounds: DOMRect | null = null
+      if (sectionEl) {
+        sectionBounds = sectionEl.getBoundingClientRect()
+      }
       for (let i = bullets.length - 1; i >= 0; i--) {
         const b = bullets[i]
         b.x += b.vx
         b.y += b.vy
 
-        b.life--
-        if (b.life <= 0) {
+        // Despawn when outside the section bounds
+        if (sectionBounds) {
+          const margin = 80
+          if (
+            b.x < sectionBounds.left - margin ||
+            b.x > sectionBounds.right + margin ||
+            b.y < sectionBounds.top - margin ||
+            b.y > sectionBounds.bottom + margin
+          ) {
+            bullets.splice(i, 1)
+            continue
+          }
+        } else if (
+          b.x < -100 || b.x > window.innerWidth + 100 ||
+          b.y < -100 || b.y > window.innerHeight + 100
+        ) {
           bullets.splice(i, 1)
           continue
         }
+
         // Bullet position relative to canvas
         const bx = b.x - (cur.x - SIZE / 2)
         const by = b.y - (cur.y - SIZE / 2)
+
+        // Draw comet trail: 3 circles along velocity direction
+        const dx = b.vx / BULLET_SPEED
+        const dy = b.vy / BULLET_SPEED
+        const trailOpacities = [0.3, 0.6]
+        for (let t = 0; t < trailOpacities.length; t++) {
+          const tb = t + 1
+          ctx.beginPath()
+          ctx.arc(bx - dx * tb * 4, by - dy * tb * 4, 2, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(250, 204, 21, ${trailOpacities[t]})`
+          ctx.fill()
+        }
+        // Main bullet
         ctx.beginPath()
         ctx.arc(bx, by, 2.5, 0, Math.PI * 2)
         ctx.fillStyle = '#facc15'

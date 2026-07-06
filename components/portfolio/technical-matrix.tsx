@@ -108,8 +108,6 @@ type Asteroid = {
   vx: number
   vy: number
   size: number
-  rotation: number
-  rotationSpeed: number
 }
 
 type Particle = {
@@ -123,8 +121,8 @@ type Particle = {
   color: string
 }
 
-const ASTEROID_SPEEDS = [1.2, 1.8, 2.5]
-const SPAWN_INTERVALS = [3500, 2500, 1500]
+const ASTEROID_SPEEDS = [0.4, 0.6, 0.8]
+const SPAWN_INTERVALS = [4000, 3000, 2000]
 
 export function TechnicalMatrix() {
   const [hp, setHp] = useState(3)
@@ -180,34 +178,33 @@ export function TechnicalMatrix() {
     return document.getElementById('matrix-card')?.getBoundingClientRect() ?? null
   }, [])
 
+  const getSectionRect = useCallback(() => {
+    return document.getElementById('matrix')?.getBoundingClientRect() ?? null
+  }, [])
+
   const spawnAsteroid = useCallback(() => {
+    const sectionRect = getSectionRect()
     const treeRect = getTreeRect()
-    if (!treeRect) return
+    if (!sectionRect || !treeRect) return
 
-    const side = Math.random() * 3
+    const side = Math.random() < 0.5 ? 0 : 1
     let x: number, y: number
-    const margin = 40 + Math.random() * 40
 
-    if (side < 1) {
-      // Left
-      x = treeRect.left - margin
-      y = treeRect.top + Math.random() * treeRect.height
-    } else if (side < 2) {
-      // Right
-      x = treeRect.right + margin
-      y = treeRect.top + Math.random() * treeRect.height
+    if (side === 0) {
+      // Left edge of section
+      x = sectionRect.left - 40
     } else {
-      // Top
-      x = treeRect.left + Math.random() * treeRect.width
-      y = treeRect.top - margin
+      // Right edge of section
+      x = sectionRect.right + 40
     }
+    y = sectionRect.top + Math.random() * sectionRect.height
 
     const cx = treeRect.left + treeRect.width / 2
     const cy = treeRect.top + treeRect.height / 2
     const dx = cx - x
     const dy = cy - y
     const dist = Math.sqrt(dx * dx + dy * dy)
-    const speed = asteroidSpeedRef.current + Math.random() * 0.5
+    const speed = asteroidSpeedRef.current + Math.random() * 0.4
 
     const asteroid: Asteroid = {
       id: asteroidIdRef.current++,
@@ -215,33 +212,38 @@ export function TechnicalMatrix() {
       y,
       vx: (dx / dist) * speed,
       vy: (dy / dist) * speed,
-      size: 12 + Math.random() * 8,
-      rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.03,
+      size: 36 + Math.random() * 12,
     }
 
     asteroidsRef.current.push(asteroid)
 
-    // Create DOM element
-    const el = document.createElement('div')
-    el.style.cssText = `
+    // Create DOM element — outer wrapper for positioning, inner for CSS rotation
+    const opacity = 0.4 + Math.random() * 0.3
+    const rotDuration = 3 + Math.random() * 4
+    const wrapper = document.createElement('div')
+    wrapper.style.cssText = `
       position: fixed;
       left: ${asteroid.x}px;
       top: ${asteroid.y}px;
-      width: ${asteroid.size}px;
-      height: ${asteroid.size}px;
-      background-color: #22d3ee;
-      opacity: 0.6;
-      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-      transform: translate(-50%, -50%) rotate(${asteroid.rotation}rad);
+      transform: translate(-50%, -50%);
       z-index: 50;
       pointer-events: none;
     `
-    asteroidContainerRef.current?.appendChild(el)
-    asteroidElsRef.current.set(asteroid.id, el)
+    const inner = document.createElement('div')
+    inner.style.cssText = `
+      width: ${asteroid.size}px;
+      height: ${asteroid.size}px;
+      background-color: #22d3ee;
+      opacity: ${opacity};
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      animation: asteroid-spin ${rotDuration}s linear infinite;
+    `
+    wrapper.appendChild(inner)
+    asteroidContainerRef.current?.appendChild(wrapper)
+    asteroidElsRef.current.set(asteroid.id, wrapper)
 
     forceRender((v) => v + 1)
-  }, [getTreeRect])
+  }, [getTreeRect, getSectionRect])
 
   const createPopEffect = useCallback((x: number, y: number) => {
     const el = document.createElement('div')
@@ -374,14 +376,12 @@ export function TechnicalMatrix() {
         // Move
         a.x += a.vx
         a.y += a.vy
-        a.rotation += a.rotationSpeed
 
-        // Update DOM element
+        // Update DOM element (wrapper)
         const el = asteroidElsRef.current.get(a.id)
         if (el) {
           el.style.left = `${a.x}px`
           el.style.top = `${a.y}px`
-          el.style.transform = `translate(-50%, -50%) rotate(${a.rotation}rad)`
         }
 
         // Bullet-asteroid collision
@@ -390,7 +390,7 @@ export function TechnicalMatrix() {
           const b = bulletData[bi]
           const dx = b.x - a.x
           const dy = b.y - a.y
-          if (Math.sqrt(dx * dx + dy * dy) < 15) {
+          if (Math.sqrt(dx * dx + dy * dy) < 25) {
             bulletHit = true
             break
           }
@@ -405,14 +405,13 @@ export function TechnicalMatrix() {
           continue
         }
 
-        // Asteroid-tree collision
+        // Asteroid-tree collision — check if asteroid center is within card's rect
         if (treeRect) {
-          const halfSize = a.size / 2
           if (
-            a.x + halfSize > treeRect.left &&
-            a.x - halfSize < treeRect.right &&
-            a.y + halfSize > treeRect.top &&
-            a.y - halfSize < treeRect.bottom
+            a.x >= treeRect.left &&
+            a.x <= treeRect.right &&
+            a.y >= treeRect.top &&
+            a.y <= treeRect.bottom
           ) {
             removedAsteroids.push(a.id)
             setShaking(true)
@@ -498,6 +497,10 @@ export function TechnicalMatrix() {
           25% { transform: translateX(-4px); }
           75% { transform: translateX(4px); }
         }
+        @keyframes asteroid-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
         @keyframes fadeOut {
           0% { opacity: 1; }
           100% { opacity: 0; }
@@ -561,7 +564,7 @@ export function TechnicalMatrix() {
       {/* Terminal-style container with CRT scan lines */}
       <div
         id="matrix-card"
-        className={`border border-border bg-card rounded-sm overflow-hidden w-full relative${shaking ? ' shake' : ''}`}
+        className={`border border-border bg-card rounded-sm overflow-hidden max-w-[420px] mx-auto relative${shaking ? ' shake' : ''}`}
       >
         {/* CRT scan line overlay */}
         <div
@@ -644,8 +647,7 @@ export function TechnicalMatrix() {
               style={{ animation: 'pulse 2s ease-in-out infinite' }}
             >
               {isCorrupted ? 'OFFLINE' : 'READY'}
-            </span>{' '}
-            | {treeLines.length} nodes
+            </span>
             {!isCorrupted && (
               <>
                 <span className="ml-3 text-muted-foreground/50">
