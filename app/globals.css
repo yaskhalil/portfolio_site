@@ -122,3 +122,8 @@ code[data-theme*=" "] span {
     background-color: var(--shiki-dark-bg);
   }
 }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

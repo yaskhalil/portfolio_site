@@ -110,8 +110,24 @@ export function TechnicalMatrix() {
         </h2>
       </div>
 
-      {/* Terminal-style container */}
-      <div className="border border-border bg-card rounded-sm overflow-hidden max-w-xl mx-auto">
+      {/* Terminal-style container with CRT scan lines */}
+      <div className="border border-border bg-card rounded-sm overflow-hidden max-w-xl mx-auto relative">
+        {/* CRT scan line overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px)',
+            zIndex: 1,
+          }}
+        />
+        {/* Cyan glow on border */}
+        <div
+          className="absolute -inset-px rounded-sm pointer-events-none opacity-20"
+          style={{
+            boxShadow: '0 0 20px rgba(34, 211, 238, 0.3), inset 0 0 20px rgba(34, 211, 238, 0.05)',
+            zIndex: 0,
+          }}
+        />
         {/* Terminal header */}
         <div className="flex items-center gap-2 px-4 py-3 bg-secondary/50 border-b border-border">
           <div className="w-3 h-3 rounded-full bg-destructive/50" />
@@ -130,7 +146,7 @@ export function TechnicalMatrix() {
         {/* Terminal footer */}
         <div className="px-6 py-3 bg-secondary/30 border-t border-border">
           <div className="font-mono text-xs text-muted-foreground">
-            <span className="text-accent">READY</span> | {totalNodes} nodes
+            <span className="text-accent" style={{animation:'pulse 2s ease-in-out infinite'}}>READY</span> | {totalNodes} nodes
           </div>
         </div>
       </div>
