@@ -510,7 +510,10 @@ export function AsciiMesh() {
     const phase = (elapsed % CYCLE_DURATION_MS) / CYCLE_DURATION_MS
 
     const t = elapsed / 1000
-    const pulse = 0.5 + 0.5 * Math.sin(t * 2)
+    // Scroll impulse: briefly accelerates morph when scrolling
+    const scrollBoost = scrollRef.current
+    scrollRef.current *= 0.92
+    const pulse = 0.5 + 0.5 * Math.sin(t * 2 + scrollBoost * 5)
 
     // Star point positions (normalized 0-1)
     const starPoints: [number, number][] = []
@@ -630,9 +633,18 @@ export function AsciiMesh() {
     }
     window.addEventListener("mousemove", onMouse)
 
+    const onScroll = () => {
+      const sy = window.scrollY || 0
+      const prev = (window as any).__lastScrollY || 0
+      scrollRef.current = Math.min(5, Math.abs(sy - prev) / 100)
+      ;(window as any).__lastScrollY = sy
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current)
       window.removeEventListener("mousemove", onMouse)
+      window.removeEventListener("scroll", onScroll)
     }
   }, [draw])
 
