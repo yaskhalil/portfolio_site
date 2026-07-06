@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist_Mono, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import TerminalCursor from '@/components/terminal-cursor'
 import 'katex/dist/katex.min.css'
 import './globals.css'
 
@@ -47,6 +48,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
         {children}
         <Analytics />
+        <TerminalCursor />
       </body>
     </html>
   )
