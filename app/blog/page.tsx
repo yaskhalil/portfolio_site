@@ -1,34 +1,5 @@
 import Link from "next/link"
-
-const posts = [
-  {
-    slug: "the-idea-of-insecurity",
-    title: "The Idea Of Insecurity",
-    description: "On the trap of modern comparison, and what a hot shower reminded me about my younger self.",
-    date: "2026-07-05",
-  },
-  {
-    slug: "engineering-cell-part-1",
-    title: "The 17,000-Dimensional Elephant",
-    description: "From DepMap transcriptomics to a 30-gene Mesenchymal signature.",
-    date: "2026-03-20",
-    part: 1,
-  },
-  {
-    slug: "engineering-cell-part-2",
-    title: "Breaking the 0.5 Deadlock",
-    description: "pyMaBoSS, threshold logic, and collapsing 1,140 attractors to three.",
-    date: "2026-03-20",
-    part: 2,
-  },
-  {
-    slug: "engineering-cell-part-3",
-    title: "Turning Cells into Matrices",
-    description: "Semi-Tensor Product, Boolean control networks, and prescriptive perturbation.",
-    date: "2026-03-20",
-    part: 3,
-  },
-] as const
+import { blogPosts } from "@/lib/blog-posts"
 
 export default function BlogPage() {
   return (
@@ -41,19 +12,19 @@ export default function BlogPage() {
           Blog
         </h1>
         <p className="mt-3 font-mono text-sm text-muted-foreground">
-          Engineering a Cell: From 17,000 Dimensions to a Single Matrix
+          All published writing
         </p>
       </div>
 
       <div className="space-y-6 max-w-4xl">
-        {posts.map((post) => (
+        {blogPosts.filter(p => p.status === "published").map((post) => (
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}
             className="block p-6 border border-border bg-card rounded-sm hover:border-primary/50 hover:bg-secondary/20 transition-colors group"
           >
             <div className="font-mono text-xs text-muted-foreground mb-2">
-              {'part' in post ? `Part ${(post as typeof posts[number]).part} · ` : ''}{post.date}
+              {'part' in post ? `Part ${(post as typeof blogPosts[number] & {part: number}).part} · ` : ''}{post.date}
             </div>
             <h2 className="text-lg font-sans font-semibold text-foreground group-hover:text-primary transition-colors">
               {post.title}

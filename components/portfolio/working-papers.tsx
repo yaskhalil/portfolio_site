@@ -3,38 +3,9 @@
 import Link from "next/link"
 import { useRef } from "react"
 import { GitCommit, Clock, ChevronDown, ChevronUp } from "lucide-react"
+import { blogPosts, postHashes } from "@/lib/blog-posts"
 
-interface BlogEntry {
-  slug: string
-  hash: string
-  date: string
-  title: string
-  status: "published" | "in-progress" | "draft"
-}
-
-const blogEntries: BlogEntry[] = [
-  {
-    slug: "engineering-cell-part-1",
-    hash: "a1b2c3d",
-    date: "2026-03-20",
-    title: "The 17,000-Dimensional Elephant",
-    status: "published",
-  },
-  {
-    slug: "engineering-cell-part-2",
-    hash: "e4f5g6h",
-    date: "2026-03-20",
-    title: "Breaking the 0.5 Deadlock",
-    status: "published",
-  },
-  {
-    slug: "engineering-cell-part-3",
-    hash: "i7j8k9l",
-    date: "2026-03-20",
-    title: "Turning Cells into Matrices",
-    status: "published",
-  },
-]
+const publishedPosts = blogPosts.filter(p => p.status === "published")
 
 const statusColors = {
   "published": "text-accent",
@@ -53,7 +24,7 @@ const SCROLL_THRESHOLD = 4
 export function WorkingPapers() {
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  const showScrollArrows = blogEntries.length > SCROLL_THRESHOLD
+  const showScrollArrows = publishedPosts.length > SCROLL_THRESHOLD
 
   const scroll = (direction: "up" | "down") => {
     const el = scrollRef.current
@@ -73,7 +44,7 @@ export function WorkingPapers() {
           Blog
         </h2>
         <p className="mt-3 font-mono text-sm text-muted-foreground">
-          Engineering a Cell: From 17,000 Dimensions to a Single Matrix
+          Published writing
         </p>
       </div>
 
@@ -91,7 +62,7 @@ export function WorkingPapers() {
             ref={scrollRef}
             className={`flex-1 divide-y divide-border ${showScrollArrows ? "max-h-[320px] overflow-y-auto" : ""}`}
           >
-            {blogEntries.map((entry) => (
+            {publishedPosts.map((entry) => (
               <Link
                 key={entry.slug}
                 href={`/blog/${entry.slug}`}
@@ -100,7 +71,7 @@ export function WorkingPapers() {
                 <div className="flex flex-col md:flex-row md:items-start gap-3 md:gap-6">
                   <div className="flex items-center gap-4 md:w-48 shrink-0">
                     <code className="font-mono text-sm text-primary">
-                      {entry.hash}
+                      {postHashes[entry.slug] ?? entry.slug.slice(0, 7)}
                     </code>
                     <div className="flex items-center gap-1 text-muted-foreground">
                       <Clock className="w-3 h-3" />
@@ -113,9 +84,11 @@ export function WorkingPapers() {
                     </p>
                   </div>
                   <div className="md:w-24 shrink-0">
-                    <span className={`font-mono text-xs ${statusColors[entry.status]}`}>
-                      [{statusLabels[entry.status]}]
-                    </span>
+                    {entry.status && (
+                      <span className={`font-mono text-xs ${statusColors[entry.status]}`}>
+                        [{statusLabels[entry.status]}]
+                      </span>
+                    )}
                   </div>
                 </div>
               </Link>
@@ -148,8 +121,8 @@ export function WorkingPapers() {
         <div className="px-6 py-3 bg-secondary/30 border-t border-border">
           <div className="font-mono text-xs text-muted-foreground flex items-center justify-between">
             <span>
-              <span className="text-primary">{blogEntries.length}</span> entries |
-              <span className="text-accent ml-1">{blogEntries.filter(e => e.status === "published").length}</span> merged
+              <span className="text-primary">{publishedPosts.length}</span> entries |
+              <span className="text-accent ml-1">{publishedPosts.length}</span> merged
             </span>
             <span className="text-muted-foreground">HEAD -{">"} main</span>
           </div>
