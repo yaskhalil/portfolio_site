@@ -53,6 +53,7 @@ const projects: Project[] = [
     subtitle: "Co-Founder & Full-Stack Engineer | Hybrid | May 2025 – Mar 2026",
     bullets: [
       "Built Talii to replace outdated barber platforms: fragmented booking, no client retention, and no-shows plague the industry, so I co-founded and shipped a unified scheduling, client-management, and discovery platform end-to-end, growing it to a live user base.",
+      "Proposed the operations system the company runs on today — designed the core workflow from scratch and presented it to multiple shareholders.",
       "Engineered the whole ecosystem on a unified TypeScript mono-repo with 110+ modular components, keeping feature parity across web and native mobile so barbers and clients get the same experience on any device.",
       "Designed a normalized PostgreSQL schema with RLS-based security for distributed scheduling, entity locations, and analytics — permissions enforced at the database layer rather than in app code.",
     ],
