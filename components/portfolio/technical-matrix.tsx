@@ -210,11 +210,11 @@ export function TechnicalMatrix() {
     const rotDuration = 3 + Math.random() * 4
     const wrapper = document.createElement('div')
     wrapper.style.cssText = `
-      position: fixed;
-      left: ${asteroid.x}px;
-      top: ${asteroid.y}px;
+      position: absolute;
+      left: ${asteroid.x - sectionRect.left}px;
+      top: ${asteroid.y - sectionRect.top}px;
       transform: translate(-50%, -50%);
-      z-index: 50;
+      z-index: 10;
       pointer-events: none;
     `
     const inner = document.createElement('div')
@@ -234,29 +234,33 @@ export function TechnicalMatrix() {
   }, [getTreeRect, getSectionRect])
 
   const createPopEffect = useCallback((x: number, y: number) => {
+    const sectionRect = getSectionRect()
+    if (!sectionRect) return
     const el = document.createElement('div')
     el.style.cssText = `
-      position: fixed;
-      left: ${x}px;
-      top: ${y}px;
+      position: absolute;
+      left: ${x - sectionRect.left}px;
+      top: ${y - sectionRect.top}px;
       width: 24px;
       height: 24px;
       transform: translate(-50%, -50%);
       background: radial-gradient(circle, #22d3ee 0%, rgba(34,211,238,0.3) 50%, transparent 70%);
       border-radius: 50%;
-      z-index: 60;
+      z-index: 20;
       pointer-events: none;
       transition: all 0.25s ease-out;
     `
-    document.body.appendChild(el)
+    asteroidContainerRef.current?.appendChild(el)
     requestAnimationFrame(() => {
       el.style.transform = 'translate(-50%, -50%) scale(2.5)'
       el.style.opacity = '0'
     })
     setTimeout(() => el.remove(), 250)
-  }, [])
+  }, [getSectionRect])
 
   const spawnParticles = useCallback((x: number, y: number) => {
+    const sectionRect = getSectionRect()
+    if (!sectionRect) return
     const count = 6 + Math.floor(Math.random() * 3) // 6-8
     const colors = ['#f97316', '#facc15', '#ef4444']
     for (let i = 0; i < count; i++) {
@@ -276,21 +280,21 @@ export function TechnicalMatrix() {
 
       const el = document.createElement('div')
       el.style.cssText = `
-        position: fixed;
-        left: ${x}px;
-        top: ${y}px;
+        position: absolute;
+        left: ${x - sectionRect.left}px;
+        top: ${y - sectionRect.top}px;
         width: 4px;
         height: 4px;
         background: ${particle.color};
         border-radius: 50%;
         transform: translate(-50%, -50%);
-        z-index: 60;
+        z-index: 20;
         pointer-events: none;
       `
       particlesContainerRef.current?.appendChild(el)
       particleElsRef.current.set(particle.id, el)
     }
-  }, [])
+  }, [getSectionRect])
 
   // Game loop
   useEffect(() => {
@@ -377,6 +381,7 @@ export function TechnicalMatrix() {
       }
 
       const treeRect = getTreeRect()
+      const sectionRect = getSectionRect()
       const asteroids = asteroidsRef.current
       const removedAsteroids: number[] = []
 
@@ -390,11 +395,11 @@ export function TechnicalMatrix() {
         a.x += a.vx
         a.y += a.vy
 
-        // Update DOM element (wrapper)
+        // Update DOM element (wrapper) — section-relative so cubes scroll with the page
         const el = asteroidElsRef.current.get(a.id)
-        if (el) {
-          el.style.left = `${a.x}px`
-          el.style.top = `${a.y}px`
+        if (el && sectionRect) {
+          el.style.left = `${a.x - sectionRect.left}px`
+          el.style.top = `${a.y - sectionRect.top}px`
         }
 
         // Bullet-asteroid collision
@@ -456,9 +461,9 @@ export function TechnicalMatrix() {
         p.life--
 
         const pel = particleElsRef.current.get(p.id)
-        if (pel) {
-          pel.style.left = `${p.x}px`
-          pel.style.top = `${p.y}px`
+        if (pel && sectionRect) {
+          pel.style.left = `${p.x - sectionRect.left}px`
+          pel.style.top = `${p.y - sectionRect.top}px`
           pel.style.opacity = `${Math.max(0, p.life / p.maxLife)}`
         }
 
@@ -477,7 +482,7 @@ export function TechnicalMatrix() {
     return () => {
       cancelAnimationFrame(rafId)
     }
-  }, [hp, spawnAsteroid, getTreeRect, handleHit, createPopEffect, spawnParticles, gameEnabled])
+  }, [hp, spawnAsteroid, getTreeRect, getSectionRect, handleHit, createPopEffect, spawnParticles, gameEnabled])
 
   // Glitch tick interval — 30ms tick when glitched branches exist and game is alive
   useEffect(() => {
@@ -557,10 +562,10 @@ export function TechnicalMatrix() {
           animation: shake 0.3s ease-in-out;
         }
       `}</style>
-      {/* Asteroid container for game asteroids */}
-      <div ref={asteroidContainerRef} aria-hidden />
+      {/* Asteroid container for game asteroids — absolute inside the section so they scroll with it */}
+      <div ref={asteroidContainerRef} className="absolute inset-0 z-10 pointer-events-none" aria-hidden />
       {/* Particles container */}
-      <div ref={particlesContainerRef} aria-hidden />
+      <div ref={particlesContainerRef} className="absolute inset-0 z-10 pointer-events-none" aria-hidden />
 
       {/* Game directions button */}
       {gameEnabled && (
