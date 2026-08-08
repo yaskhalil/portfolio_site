@@ -20,6 +20,7 @@
 - Keep the homepage sections in order: Hero → TechnicalMatrix → Projects → WorkingPapers → TerminalCTA
 
 ## See also
+- `README.md` — quickstart + doc index (links to docs/SYSTEM_DESIGN.md, the single source of truth for design)
 - `PROJECT.md` — full project overview and structure
 - `MISTAKES.md` — recorded pitfalls and lessons
 - `~/.hermes/SOUL.md` — global agent rules and OPINIONS.md location

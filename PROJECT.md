@@ -31,14 +31,19 @@ components/
 - `npm run start` — start production server
 - `npm run lint` — ESLint
 
+## Docs
+- README → links to docs/SYSTEM_DESIGN.md (never duplicate design content elsewhere)
+
 ## Git
-- GitHub: github.com/yaskhalil/portfolio_sit
+- GitHub: github.com/yaskhalil/portfolio_site
 - Default branch: main
-- Auto-deploys to Vercel on push
+- Deploys to Vercel from main (see docs/SYSTEM_DESIGN.md Deploy note; use `vercel --prod` if auto-deploy stalls)
 
 ## Status
-Live. Blog posts include Engineering a Cell series + The Idea of Insecurity. Blog index and homepage blog section now pull from shared `lib/blog-posts.ts`. Site deployed on Vercel (manual deploy, no Git auto-deploy yet). Git remote was migrated from `portfolio_sit` to `portfolio_site`.
+Live. Blog index and homepage blog section pull from shared `lib/blog-posts.ts`. Hero has ASCII mesh; TechnicalMatrix has the ship-vs-asteroids tree defense game. Current design system documented in docs/SYSTEM_DESIGN.md, which also tracks known issues (font-sans override bug, orphaned styles/globals.css, no reduced-motion handling, static DitchFeed data).
 
 ## To Do
-- [ ] Connect Vercel to GitHub for auto-deploy on push
-- [ ] Add iigma.im-inspired design polish (custom cursor, project carousel, terminal-style navigation)
+- [ ] Fix font-sans override (Inter intended, Geist unresolved) + delete orphaned styles/globals.css
+- [ ] Implement prioritized polish list in docs/SYSTEM_DESIGN.md (see "Current gaps" + session improvement plan)
+- [ ] Add resume link + X/Medium/Substack to TerminalCTA
+- [ ] OG image + JSON-LD Person schema for link previews
