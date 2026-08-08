@@ -36,15 +36,17 @@ export function DitchFeed() {
 
         <div className="divide-y divide-border">
           {entries.map((entry, i) => (
-            <div key={i} className="flex items-center gap-3 px-4 md:px-6 py-3">
-              <span className="text-base shrink-0">{entry.emoji}</span>
-              <p className="font-mono text-sm text-foreground flex-1 truncate">
-                {entry.label}
-              </p>
-              <span className="font-mono text-xs text-muted-foreground shrink-0">
-                {entry.ago}
-              </span>
-            </div>
+            <SectionReveal key={i}>
+              <div className="flex items-center gap-3 px-4 md:px-6 py-3">
+                <span className="text-base shrink-0">{entry.emoji}</span>
+                <p className="font-mono text-sm text-foreground flex-1 truncate">
+                  {entry.label}
+                </p>
+                <span className="font-mono text-xs text-muted-foreground shrink-0">
+                  {entry.ago}
+                </span>
+              </div>
+            </SectionReveal>
           ))}
         </div>
 

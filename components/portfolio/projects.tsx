@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { ChevronDown, ExternalLink } from "lucide-react"
+import SectionReveal from "@/components/section-reveal"
 
 interface Project {
   id: string
@@ -107,8 +108,8 @@ export function Projects() {
       {/* Projects Accordion */}
       <div className="space-y-4">
         {projects.map((project, index) => (
+          <SectionReveal key={project.id}>
           <div 
-            key={project.id}
             className="border border-border bg-card rounded-sm overflow-hidden"
           >
             {/* Accordion Header */}
@@ -218,6 +219,7 @@ export function Projects() {
               </div>
             </div>
           </div>
+          </SectionReveal>
         ))}
       </div>
     </section>
