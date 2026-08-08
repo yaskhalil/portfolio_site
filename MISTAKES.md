@@ -19,3 +19,9 @@
 ## [2026-07-05] HSL color format works on canvas
 - **What happened:** Switched from hardcoded RGB `"rgb(0, 255, 229)"` to computed HSL `"hsl(180, 100%, 60%)"` — rendered correctly.
 - **Pattern to adopt:** HSL is valid in canvas `fillStyle`. Use it for dynamic color cycling.
+
+## [2026-08-07] Tailwind 4 `@theme inline` silently overrides next/font variables
+- **What happened:** `layout.tsx` loads Inter as `--font-sans` via next/font, but globals.css `@theme inline { --font-sans: 'Geist', ... }` inlined the literal (unloaded) family into every `font-sans` utility. All sans text rendered as the system default — no error, no warning, just wrong typography.
+- **Fix:** Removed the two font lines from the `@theme inline` block. Tailwind 4's default theme emits `font-family: var(--font-sans)`, so the body-level next/font variable wins. Verified computed style: `Inter, "Inter Fallback"`.
+- **Pattern to avoid:** Never define `--font-sans`/`--font-mono` inside `@theme inline` when using next/font variables. Let the default `var(--font-*)` indirection do the work. Verify typography via computed style, not eyeballing.
+- **Bonus:** A duplicate `styles/globals.css` (v0 default light theme, never imported) was sitting in the repo — grep for the import before assuming a file is live.

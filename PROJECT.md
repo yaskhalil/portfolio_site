@@ -40,10 +40,10 @@ components/
 - Deploys to Vercel from main (see docs/SYSTEM_DESIGN.md Deploy note; use `vercel --prod` if auto-deploy stalls)
 
 ## Status
-Live. Blog index and homepage blog section pull from shared `lib/blog-posts.ts`. Hero has ASCII mesh; TechnicalMatrix has the ship-vs-asteroids tree defense game. Current design system documented in docs/SYSTEM_DESIGN.md, which also tracks known issues (font-sans override bug, orphaned styles/globals.css, no reduced-motion handling, static DitchFeed data).
+Live. Hero title overlays the ASCII mesh (above the fold); TechnicalMatrix has the ship-vs-asteroids tree defense game; TerminalCTA is an interactive shell (type `help`); scrollspy + keyboard nav; OG image + JSON-LD; resume at /resume.pdf (placeholder from Mar 2025 — swap for current). Design system in docs/SYSTEM_DESIGN.md is the single source of truth.
 
 ## To Do
-- [ ] Fix font-sans override (Inter intended, Geist unresolved) + delete orphaned styles/globals.css
-- [ ] Implement prioritized polish list in docs/SYSTEM_DESIGN.md (see "Current gaps" + session improvement plan)
-- [ ] Add resume link + X/Medium/Substack to TerminalCTA
-- [ ] OG image + JSON-LD Person schema for link previews
+- [ ] Replace public/resume.pdf with the current resume
+- [ ] Wire DitchFeed to real data (GitHub events API / RSS) or rename — currently static, implies live activity
+- [ ] Vary section header treatments / panel widths (currently uniform rhythm)
+- [ ] Consider light theme or system-theme support (dark-only today)
