@@ -24,39 +24,56 @@ const projects: Project[] = [
     title: "Temple University",
     subtitle: "Machine Learning Research Intern | Hybrid | May 2026 – Present",
     bullets: [
-      "Architecting analytical software to evaluate neural gene expression, focusing on high-dimensional system dynamics in developmental models.",
-      "Implementing KSG k-Nearest Neighbors (KSG-KNN) estimators to process complex datasets, extracting novel computational metrics to accelerate laboratory investigation."
+      "Created FlyGPlot (fly-g-plot.vercel.app), a Drosophila transcription-factor explorer that pipelines single-cell expression data through TF → module → functional enrichment analysis, integrating FlyBase, Ensembl, STRING-DB, g:Profiler, Enrichr, and NCBI GEO.",
+      "Designing a KSG k-nearest-neighbor mutual-information pipeline that ranks split-GAL4 hemidriver (AD/DBD) gene pairs on continuous single-cell expression from the developing Drosophila optic lobe, capturing threshold and saturation effects that binary Jaccard/specificity heuristics discard.",
+      "Validating KSG-derived rankings against previously validated split-GAL4 combinations from the literature, benchmarking against Spearman-correlation and Jaccard baselines to quantify recovery of known driver pairs.",
     ],
-    tags: ["Machine Learning", "Neural Gene Expression", "KSG-KNN", "Systems Biology"],
-    documentationLabel: "Research Ongoing",
+    tags: ["Machine Learning", "FlyGPlot", "scRNA-seq", "KSG-MI", "Split-GAL4"],
+    documentationUrl: "https://fly-g-plot.vercel.app/",
+    documentationLabel: "view_flygplot",
+    statusLabel: "Research Ongoing",
   },
   {
     id: "vt-science",
     title: "Virginia Tech College of Science",
     subtitle: "Undergraduate Joint Researcher | On-site | Dec 2025 – Present",
     bullets: [
-      "Architected a PyTorch-based Semi-Tensor Product Graph Neural Network (STP-GNN), engineering an algebraic transition operator using Khatri-Rao assembly to map discrete Boolean logic into a continuous, differentiable landscape scaled for 2²⁰+ state-space circuits.",
-      "Condensed a 30-variable module from an unstable 1,140+ attractor space down to 3 functional basins, executing 10,000-trajectory stochastic simulations to mathematically prove absolute structural robustness within the system dynamics.",
-      "Engineered gradient-directed perturbation algorithms to bypass invariant manifold bottlenecks, validating the architecture against discrete probabilistic baselines with <0.1% variance."
+      "Developed STP-Diff, a differentiable framework that maps discrete Boolean gene-network dynamics onto a manifold via Semi-Tensor Product (STP) with an implicit Vector-Jacobian Product (VJP) operator, cutting complexity from O(4^N) to O(N·2^N) — a measured 353x speedup at N=20.",
+      "Applied Projected Gradient Descent (PGD) adversarial attacks to expose the Rb-E2F axis as the vulnerability bottleneck of a 10-node mammalian cell-cycle model, validated against CRISPR-Cas9 knockout data from DepMap 25Q3 (1000+ cancer cell lines, p < 10^-6).",
+      "Quantified network resilience through Epsilon-Critical search, establishing ε_critical = 2.8000 for the p53-Mdm2 DNA-damage circuit.",
     ],
-    tags: ["PyTorch", "STP-GNN", "State-Space", "Stochastic Simulation"],
-    documentationUrl: "https://github.com/yaskhalil/Benchmark-STP-vs-MLLR",
-    documentationLabel: "view_research_code",
-    statusLabel: "ArXiv Publication Coming Soon",
+    tags: ["PyTorch", "STP-Diff", "Semi-Tensor Product", "Adversarial ML", "Systems Biology"],
+    documentationUrl: "https://doi.org/10.13140/RG.2.2.35274.32965",
+    documentationLabel: "view_paper",
+    statusLabel: "Preprint",
   },
   {
     id: "talii",
     title: "Talii",
     subtitle: "Co-Founder & Full-Stack Engineer | Hybrid | May 2025 – Mar 2026",
     bullets: [
-      "Engineered and launched a cross-platform ecosystem using a unified TypeScript mono-repo and 110+ modular components, ensuring feature parity across web and native mobile applications.",
-      "Designed and normalized a PostgreSQL schema to support distributed scheduling, entity locations, and analytics with scalable RLS-based security."
+      "Grew the platform to a live user base and shipped the full application end-to-end, replacing outdated barber booking platforms with a unified scheduling, client-management, and discovery experience.",
+      "Engineered a cross-platform ecosystem using a unified TypeScript mono-repo and 110+ modular components, ensuring feature parity across web and native mobile applications.",
+      "Designed and normalized a PostgreSQL schema to support distributed scheduling, entity locations, and analytics with scalable RLS-based security.",
     ],
     tags: ["TypeScript Mono-repo", "React Native", "PostgreSQL", "RLS Security"],
     documentationUrl: "https://github.com/yaskhalil/talii",
     documentationLabel: "view_code",
     statusLabel: "Code Available",
     statusUrl: "https://github.com/yaskhalil/talii",
+  },
+  {
+    id: "la-unica",
+    title: "La-Unica (Real Estate Startup)",
+    subtitle: "Machine Learning Engineer & Front-End Developer | Contract",
+    bullets: [
+      "Developed machine learning models and front-end work for La-Unica, a venture-backed real estate startup — delivered under contract, with the platform front end built out as a proposed system.",
+      "Joined the founding team on a project with multi-million-dollar VC backing and clients already waiting — leading all machine learning work.",
+      "Specific architecture and model details are under NDA.",
+    ],
+    tags: ["Machine Learning", "Real Estate", "React", "Frontend"],
+    documentationLabel: "details under NDA",
+    statusLabel: "Under NDA",
   },
   {
     id: "honeyruns",
@@ -66,7 +83,7 @@ const projects: Project[] = [
       "Designed and deployed an end-to-end vehicle health monitoring neural network leveraging a bi-directional LSTM with attention mechanisms.",
       "Improved anomaly detection accuracy from 40-60% to 87-95% through iterative retraining on 30K+ telemetry points every 10 minutes.",
       "Architected a three-tier anomaly detection pipeline utilizing LSTM for sequential insights and DBSCAN for geographic hotspot clustering.",
-      "Built scalable FastAPI microservices on Railway with Supabase integration, exposing telemetry insights via an internal dashboard UI."
+      "Built scalable FastAPI microservices on Railway with Supabase integration, exposing telemetry insights via an internal dashboard UI.",
     ],
     tags: ["BiLSTM", "Attention Mechanisms", "DBSCAN", "FastAPI", "Supabase"],
     documentationUrl: "https://www.honeyruns.com",
@@ -77,11 +94,13 @@ const projects: Project[] = [
   {
     id: "diggeridoos",
     title: "The Diggeridoos",
-    subtitle: "Software Member | On-site | Jan 2025 – May 2025",
+    subtitle: "Front-End Developer | Virginia Tech Diggeridoos | Jan 2025 – May 2025",
     bullets: [
-      "Developed responsive web components and interactive front-end features utilizing JavaScript and React.js."
+      "Built the front end for Virginia Tech's Diggeridoos robotics team, turning Arduino telemetry into live visualizations of how the machine was operating.",
+      "Led the movement-based visualization work: a 360° sonar-style heading view with a position dot, making facing direction and turning legible at a glance for the operator.",
+      "Used React and modern front-end tooling, working on a team to convert raw sensor streams into an intuitive operator dashboard.",
     ],
-    tags: ["JavaScript", "React.js", "Frontend"],
+    tags: ["React", "Arduino", "Data Visualization", "Robotics"],
     documentationLabel: "Academic Project",
   },
 ]

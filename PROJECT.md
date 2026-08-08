@@ -40,10 +40,9 @@ components/
 - Deploys to Vercel from main (see docs/SYSTEM_DESIGN.md Deploy note; use `vercel --prod` if auto-deploy stalls)
 
 ## Status
-Live. Hero title overlays the ASCII mesh (above the fold); TechnicalMatrix has the ship-vs-asteroids tree defense game; TerminalCTA is an interactive shell (type `help`); scrollspy + keyboard nav; OG image + JSON-LD; resume at /resume.pdf (placeholder from Mar 2025 — swap for current). Design system in docs/SYSTEM_DESIGN.md is the single source of truth.
+Live. Hero title overlays the ASCII mesh (above the fold); TechnicalMatrix has the ship-vs-asteroids tree defense game; TerminalCTA is an interactive shell (type `help`); scrollspy + keyboard nav; OG image + JSON-LD. Projects: Temple (FlyGPlot + KSG split-GAL4 proposal), VT (STP-Diff, DOI 10.13140/RG.2.2.35274.32965), Talii, La-Unica (contract, NDA), HoneyRuns, Diggeridoos. Design system in docs/SYSTEM_DESIGN.md is the single source of truth.
 
 ## To Do
-- [ ] Replace public/resume.pdf with the current resume
 - [ ] Wire DitchFeed to real data (GitHub events API / RSS) or rename — currently static, implies live activity
 - [ ] Vary section header treatments / panel widths (currently uniform rhythm)
 - [ ] Consider light theme or system-theme support (dark-only today)
