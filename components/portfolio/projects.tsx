@@ -139,11 +139,12 @@ export function Projects() {
 
             {/* Accordion Content */}
             <div 
-              className={`overflow-hidden transition-all duration-300 ${
-                expandedId === project.id ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+              className={`grid transition-all duration-300 ${
+                expandedId === project.id ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
               }`}
             >
-              <div className="p-6 pt-0 border-t border-border">
+              <div className="overflow-hidden">
+                <div className="p-6 pt-0 border-t border-border">
                 {project.bullets ? (
                   <ul className="space-y-3 mb-6">
                     {project.bullets.map((bullet, bIndex) => (
@@ -179,12 +180,12 @@ export function Projects() {
                         href={project.statusUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1 font-mono text-xs text-primary hover:bg-primary/20 transition-colors"
+                        className="inline-flex items-center rounded-sm border border-primary/40 bg-primary/10 px-3 py-1 font-mono text-xs text-primary hover:bg-primary/20 transition-colors"
                       >
                         {project.statusLabel}
                       </a>
                     ) : (
-                      <span className="inline-flex items-center rounded-full border border-border bg-secondary/40 px-3 py-1 font-mono text-xs text-muted-foreground">
+                      <span className="inline-flex items-center rounded-sm border border-border bg-secondary/40 px-3 py-1 font-mono text-xs text-muted-foreground">
                         {project.statusLabel}
                       </span>
                     )
@@ -213,6 +214,7 @@ export function Projects() {
                     )
                   )}
                 </div>
+              </div>
               </div>
             </div>
           </div>
