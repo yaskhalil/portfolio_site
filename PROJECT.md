@@ -40,9 +40,9 @@ components/
 - Deploys to Vercel from main (see docs/SYSTEM_DESIGN.md Deploy note; use `vercel --prod` if auto-deploy stalls)
 
 ## Status
-Live. Hero title overlays the ASCII mesh (above the fold); TechnicalMatrix has the ship-vs-asteroids tree defense game; TerminalCTA is an interactive shell (type `help`); scrollspy + keyboard nav; OG image + JSON-LD. Projects: Temple (FlyGPlot + KSG split-GAL4 proposal), VT (STP-Diff, DOI 10.13140/RG.2.2.35274.32965), Talii, La-Unica (contract, NDA), HoneyRuns, Diggeridoos. Design system in docs/SYSTEM_DESIGN.md is the single source of truth.
+Live. Hero title overlays the ASCII mesh (above the fold); TechnicalMatrix has the ship-vs-asteroids tree defense game; TerminalCTA is an interactive shell (type `help`); scrollspy + keyboard nav; OG image + JSON-LD. Projects: Temple (FlyGPlot + KSG split-GAL4 proposal), VT (STP-Diff, DOI 10.13140/RG.2.2.35274.32965), Talii, La-Unica (contract, NDA), HoneyRuns, Diggeridoos — bullets are deliberately explanatory (problem → approach → outcome). Blog list mirrors what is published on Medium (@yaskhalil2006) and Substack (@yaseenkhalil), including "Building in Public When You're Still Figuring It Out" (2026-07-30); Ditch section removed. Design system in docs/SYSTEM_DESIGN.md is the single source of truth.
 
 ## To Do
-- [ ] Wire DitchFeed to real data (GitHub events API / RSS) or rename — currently static, implies live activity
+- [ ] Wire a periodic check of Medium/Substack feeds into the blog list (currently manual — see docs/SYSTEM_DESIGN.md section 5)
 - [ ] Vary section header treatments / panel widths (currently uniform rhythm)
 - [ ] Consider light theme or system-theme support (dark-only today)
