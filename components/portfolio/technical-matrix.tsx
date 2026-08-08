@@ -184,11 +184,12 @@ export function TechnicalMatrix() {
     if (!sectionRect || !treeRect) return
 
     const side = Math.random() < 0.5 ? 0 : 1
-    const x = side === 0 ? sectionRect.left - 40 : sectionRect.right + 40
-    const y = sectionRect.top + Math.random() * sectionRect.height
+    // Section-relative coordinates — anchored to the game, scrolling never shifts them
+    const x = side === 0 ? -40 : sectionRect.width + 40
+    const y = Math.random() * sectionRect.height
 
-    const cx = treeRect.left + treeRect.width / 2
-    const cy = treeRect.top + treeRect.height / 2
+    const cx = treeRect.left - sectionRect.left + treeRect.width / 2
+    const cy = treeRect.top - sectionRect.top + treeRect.height / 2
     const dx = cx - x
     const dy = cy - y
     const dist = Math.sqrt(dx * dx + dy * dy)
@@ -211,8 +212,8 @@ export function TechnicalMatrix() {
     const wrapper = document.createElement('div')
     wrapper.style.cssText = `
       position: absolute;
-      left: ${asteroid.x - sectionRect.left}px;
-      top: ${asteroid.y - sectionRect.top}px;
+      left: ${asteroid.x}px;
+      top: ${asteroid.y}px;
       transform: translate(-50%, -50%);
       z-index: 10;
       pointer-events: none;
@@ -234,13 +235,11 @@ export function TechnicalMatrix() {
   }, [getTreeRect, getSectionRect])
 
   const createPopEffect = useCallback((x: number, y: number) => {
-    const sectionRect = getSectionRect()
-    if (!sectionRect) return
     const el = document.createElement('div')
     el.style.cssText = `
       position: absolute;
-      left: ${x - sectionRect.left}px;
-      top: ${y - sectionRect.top}px;
+      left: ${x}px;
+      top: ${y}px;
       width: 24px;
       height: 24px;
       transform: translate(-50%, -50%);
@@ -256,11 +255,9 @@ export function TechnicalMatrix() {
       el.style.opacity = '0'
     })
     setTimeout(() => el.remove(), 250)
-  }, [getSectionRect])
+  }, [])
 
   const spawnParticles = useCallback((x: number, y: number) => {
-    const sectionRect = getSectionRect()
-    if (!sectionRect) return
     const count = 6 + Math.floor(Math.random() * 3) // 6-8
     const colors = ['#f97316', '#facc15', '#ef4444']
     for (let i = 0; i < count; i++) {
@@ -281,8 +278,8 @@ export function TechnicalMatrix() {
       const el = document.createElement('div')
       el.style.cssText = `
         position: absolute;
-        left: ${x - sectionRect.left}px;
-        top: ${y - sectionRect.top}px;
+        left: ${x}px;
+        top: ${y}px;
         width: 4px;
         height: 4px;
         background: ${particle.color};
@@ -294,7 +291,7 @@ export function TechnicalMatrix() {
       particlesContainerRef.current?.appendChild(el)
       particleElsRef.current.set(particle.id, el)
     }
-  }, [getSectionRect])
+  }, [])
 
   // Game loop
   useEffect(() => {
@@ -395,22 +392,24 @@ export function TechnicalMatrix() {
         a.x += a.vx
         a.y += a.vy
 
-        // Update DOM element (wrapper) — section-relative so cubes scroll with the page
+        // Update DOM element (wrapper) — positions are section-relative, scroll-proof
         const el = asteroidElsRef.current.get(a.id)
-        if (el && sectionRect) {
-          el.style.left = `${a.x - sectionRect.left}px`
-          el.style.top = `${a.y - sectionRect.top}px`
+        if (el) {
+          el.style.left = `${a.x}px`
+          el.style.top = `${a.y}px`
         }
 
-        // Bullet-asteroid collision
+        // Bullet-asteroid collision (bullets live in viewport space; convert to section)
         let bulletHit = false
-        for (let bi = 0; bi < bulletData.length; bi++) {
-          const b = bulletData[bi]
-          const dx = b.x - a.x
-          const dy = b.y - a.y
-          if (Math.sqrt(dx * dx + dy * dy) < 25) {
-            bulletHit = true
-            break
+        if (sectionRect) {
+          for (let bi = 0; bi < bulletData.length; bi++) {
+            const b = bulletData[bi]
+            const dx = b.x - sectionRect.left - a.x
+            const dy = b.y - sectionRect.top - a.y
+            if (Math.sqrt(dx * dx + dy * dy) < 25) {
+              bulletHit = true
+              break
+            }
           }
         }
 
@@ -422,13 +421,13 @@ export function TechnicalMatrix() {
           continue
         }
 
-        // Asteroid-tree collision — check if asteroid center is within card's rect
-        if (treeRect) {
+        // Asteroid-tree collision — tree rect is viewport-space; convert to section
+        if (treeRect && sectionRect) {
           if (
-            a.x >= treeRect.left &&
-            a.x <= treeRect.right &&
-            a.y >= treeRect.top &&
-            a.y <= treeRect.bottom
+            a.x >= treeRect.left - sectionRect.left &&
+            a.x <= treeRect.right - sectionRect.left &&
+            a.y >= treeRect.top - sectionRect.top &&
+            a.y <= treeRect.bottom - sectionRect.top
           ) {
             removedAsteroids.push(a.id)
             setShaking(true)
@@ -461,9 +460,9 @@ export function TechnicalMatrix() {
         p.life--
 
         const pel = particleElsRef.current.get(p.id)
-        if (pel && sectionRect) {
-          pel.style.left = `${p.x - sectionRect.left}px`
-          pel.style.top = `${p.y - sectionRect.top}px`
+        if (pel) {
+          pel.style.left = `${p.x}px`
+          pel.style.top = `${p.y}px`
           pel.style.opacity = `${Math.max(0, p.life / p.maxLife)}`
         }
 
