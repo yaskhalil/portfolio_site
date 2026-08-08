@@ -12,6 +12,22 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined)
 
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Yaseen Khalil',
+  url: siteUrl ?? 'https://yaseenkhalil.com',
+  email: 'mailto:yaskhalil2006@gmail.com',
+  jobTitle: 'Computational Modeler & ML Systems Architect',
+  sameAs: [
+    'https://github.com/yaskhalil',
+    'https://www.linkedin.com/in/yaseenkhalil/',
+    'https://x.com/yaskhalil2006',
+    'https://medium.com/@yaskhalil2006',
+    'https://yaseenkhalil.substack.com',
+  ],
+}
+
 const title = 'Yaseen Khalil | Computational Modeler & ML Systems Architect'
 const description =
   'Exploring the mathematical architecture of intelligent systems. Bridging high-dimensional feature engineering with production data pipelines and autonomous AI integrations.'
@@ -49,6 +65,10 @@ export default function RootLayout({
         {children}
         <Analytics />
         <TerminalCursor />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
       </body>
     </html>
   )
