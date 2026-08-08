@@ -126,7 +126,7 @@ export function TechnicalMatrix() {
   const [, forceRender] = useState(0)
   const [showDirections, setShowDirections] = useState(false)
   const [score, setScore] = useState(0)
-  const [wave, setWave] = useState(1)
+  const [, setWave] = useState(1)
   const [waveFlash, setWaveFlash] = useState<string | null>(null)
   const [shaking, setShaking] = useState(false)
 
@@ -184,16 +184,8 @@ export function TechnicalMatrix() {
     if (!sectionRect || !treeRect) return
 
     const side = Math.random() < 0.5 ? 0 : 1
-    let x: number, y: number
-
-    if (side === 0) {
-      // Left edge of section
-      x = sectionRect.left - 40
-    } else {
-      // Right edge of section
-      x = sectionRect.right + 40
-    }
-    y = sectionRect.top + Math.random() * sectionRect.height
+    const x = side === 0 ? sectionRect.left - 40 : sectionRect.right + 40
+    const y = sectionRect.top + Math.random() * sectionRect.height
 
     const cx = treeRect.left + treeRect.width / 2
     const cy = treeRect.top + treeRect.height / 2
@@ -387,7 +379,6 @@ export function TechnicalMatrix() {
       const treeRect = getTreeRect()
       const asteroids = asteroidsRef.current
       const removedAsteroids: number[] = []
-      let bulletDestroyed = false
 
       for (let i = asteroids.length - 1; i >= 0; i--) {
         const a = asteroids[i]
@@ -422,7 +413,6 @@ export function TechnicalMatrix() {
           createPopEffect(a.x, a.y)
           spawnParticles(a.x, a.y)
           setScore((s) => s + 1)
-          bulletDestroyed = true
           removedAsteroids.push(a.id)
           continue
         }
@@ -528,7 +518,7 @@ export function TechnicalMatrix() {
     if (!glitchCharRatesRef.current.has(key)) {
       const chars = name.split('')
       const rates = chars.map((char) => {
-        if (/[\s\/│├└─]/.test(char)) return 0
+        if (/[\s/│├└─]/.test(char)) return 0
         return Math.random() < 0.5 ? 1 : 10
       })
       glitchCharRatesRef.current.set(key, rates)
@@ -537,7 +527,7 @@ export function TechnicalMatrix() {
     const rates = glitchCharRatesRef.current.get(key)!
     const display = glitchDisplayRef.current.get(key)!
     name.split('').forEach((char, i) => {
-      if (/[\s\/│├└─]/.test(char)) return
+      if (/[\s/│├└─]/.test(char)) return
       const rate = rates[i]
       if (rate > 0 && tick % rate === 0) {
         display[i] = garbleChar()

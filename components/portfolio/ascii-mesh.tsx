@@ -60,31 +60,6 @@ function addEdge(grid: number[][], cols: number, rows: number, x1: number, y1: n
   }
 }
 
-function addEdgeWide(
-  grid: number[][],
-  cols: number,
-  rows: number,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-  brightness: number,
-  width: number
-) {
-  const vx = x2 - x1
-  const vy = y2 - y1
-  const mag = Math.hypot(vx, vy) || 1
-  const nx = -vy / mag
-  const ny = vx / mag
-  const half = Math.max(1, Math.floor(width / 2))
-  for (let d = -half; d <= half; d++) {
-    const ox = (nx * d) / cols
-    const oy = (ny * d) / rows
-    const fade = 1 - Math.abs(d) / (half + 1)
-    addEdge(grid, cols, rows, x1 + ox, y1 + oy, x2 + ox, y2 + oy, brightness * (0.82 + 0.18 * fade))
-  }
-}
-
 // Nodes + edges: fixed star-topology graph for 6 nodes
 function nodesAndEdges(cols: number, rows: number, nodePositions: [number, number][], pulse: number): number[][] {
   const grid: number[][] = Array(rows).fill(null).map(() => Array(cols).fill(0))
@@ -393,13 +368,12 @@ function circleShape(cols: number, rows: number, rotation: number): number[][] {
       const oy = (R + r * cosP) * sinT
       const oz = r * sinP
 
-      let nx = cosP * cosT
-      let ny = cosP * sinT
-      let nz = sinP
+      const nx = cosP * cosT
+      const ny = cosP * sinT
+      const nz = sinP
 
       // Rotate around X by A
       const py = oy * cosA - oz * sinA
-      const pz = oy * sinA + oz * cosA
       const ny1 = ny * cosA - nz * sinA
       const nz1 = ny * sinA + nz * cosA
 

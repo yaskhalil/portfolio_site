@@ -61,7 +61,7 @@ export function TerminalNav() {
         </span>
         <span className="text-muted-foreground/30 mx-1 shrink-0">//</span>
         <div className="flex items-center gap-1">
-          {COMMANDS.map((cmd, i) => (
+          {COMMANDS.map((cmd) => (
             <button
               key={cmd}
               onClick={() => scrollTo(cmd)}
