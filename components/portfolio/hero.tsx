@@ -92,16 +92,22 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Hero Text — overlay panel on the mesh */}
-      <div className="absolute inset-x-0 bottom-0 px-6 md:px-12 lg:px-20 py-8 md:py-10 bg-background/70 backdrop-blur-sm border-t border-border">
+      {/* Hero Text — floats over the mesh so the animation shows through */}
+      <div className="absolute inset-x-0 bottom-0 px-6 md:px-12 lg:px-20 pb-6 md:pb-8">
         <div className="flex items-end justify-between gap-6">
-          <div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-sans font-bold text-foreground leading-tight text-balance">
+          <div className="flex-1 min-w-0">
+            <h1
+              className="text-2xl md:text-4xl 2xl:text-5xl font-sans font-bold text-foreground leading-tight text-balance"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7), 0 0 12px rgba(10,14,23,0.6)' }}
+            >
               <span className="text-primary">[</span>Yaseen Khalil<span className="text-primary">]</span>
               <span className="text-muted-foreground mx-3">|</span>
               <span className="block md:inline">Computational Modeler &amp; ML Systems Architect</span>
             </h1>
-            <p className="mt-4 md:mt-5 font-mono text-sm md:text-base text-muted-foreground max-w-3xl leading-relaxed">
+            <p
+              className="mt-3 md:mt-4 font-mono text-sm md:text-base text-muted-foreground max-w-3xl leading-relaxed"
+              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+            >
               <span className="text-primary" style={{ opacity: typing ? 1 : (blink ? 1 : 0.3) }}>{'>'}</span> {text}{cursor && <span>_</span>}
             </p>
           </div>
