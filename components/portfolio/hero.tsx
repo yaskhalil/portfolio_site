@@ -15,6 +15,12 @@ export function Hero() {
   const [blink, setBlink] = useState(false)
 
   useEffect(() => {
+    // Reduced motion: show the full subtitle immediately, no typewriter
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setText(SUBTITLE)
+      setTyping(false)
+      return
+    }
     const t = setTimeout(() => {
       let i = 0
       const iv = setInterval(() => {

@@ -118,6 +118,7 @@ const SPAWN_INTERVALS = [4000, 3000, 2000]
 
 export function TechnicalMatrix() {
   const [hp, setHp] = useState(3)
+  const [gameEnabled, setGameEnabled] = useState(true)
   const glitchedRef = useRef<Set<number>>(new Set())
   const [glitchTick, setGlitchTick] = useState(0)
   const glitchCharRatesRef = useRef<Map<string, number[]>>(new Map())
@@ -301,7 +302,18 @@ export function TechnicalMatrix() {
 
   // Game loop
   useEffect(() => {
-    if (hp <= 0) {
+    // Disable the game for reduced-motion and touch users (no mouse to aim with)
+    if (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      window.matchMedia('(pointer: coarse)').matches
+    ) {
+      setGameEnabled(false)
+    }
+  }, [])
+
+  // Game loop
+  useEffect(() => {
+    if (!gameEnabled || hp <= 0) {
       gameRunningRef.current = false
       // Clear remaining asteroid DOM elements
       asteroidElsRef.current.forEach((el) => el.remove())
@@ -475,7 +487,7 @@ export function TechnicalMatrix() {
     return () => {
       cancelAnimationFrame(rafId)
     }
-  }, [hp, spawnAsteroid, getTreeRect, handleHit, createPopEffect, spawnParticles])
+  }, [hp, spawnAsteroid, getTreeRect, handleHit, createPopEffect, spawnParticles, gameEnabled])
 
   // Glitch tick interval — 30ms tick when glitched branches exist and game is alive
   useEffect(() => {
@@ -561,13 +573,15 @@ export function TechnicalMatrix() {
       <div ref={particlesContainerRef} aria-hidden />
 
       {/* Game directions button */}
-      <button
-        onClick={() => setShowDirections((v) => !v)}
-        className="absolute top-6 right-6 md:top-8 md:right-12 lg:right-20 z-10 w-6 h-6 rounded-full border border-border flex items-center justify-center text-xs font-mono text-muted-foreground opacity-40 hover:opacity-80 transition-opacity cursor-pointer"
-        aria-label="Game directions"
-      >
-        ?
-      </button>
+      {gameEnabled && (
+        <button
+          onClick={() => setShowDirections((v) => !v)}
+          className="absolute top-6 right-6 md:top-8 md:right-12 lg:right-20 z-10 w-6 h-6 rounded-full border border-border flex items-center justify-center text-xs font-mono text-muted-foreground opacity-40 hover:opacity-80 transition-opacity cursor-pointer"
+          aria-label="Game directions"
+        >
+          ?
+        </button>
+      )}
 
       {/* Directions popup */}
       {showDirections && (
@@ -694,7 +708,7 @@ export function TechnicalMatrix() {
             >
               {isCorrupted ? 'OFFLINE' : 'READY'}
             </span>
-            {!isCorrupted && (
+            {!isCorrupted && gameEnabled && (
               <>
                 <span className="ml-3 text-muted-foreground/50">
                   | SCORE: {score}
