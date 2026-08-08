@@ -22,7 +22,6 @@ const personJsonLd = {
   sameAs: [
     'https://github.com/yaskhalil',
     'https://www.linkedin.com/in/yaseenkhalil/',
-    'https://x.com/yaskhalil2006',
     'https://medium.com/@yaskhalil2006',
     'https://yaseenkhalil.substack.com',
   ],

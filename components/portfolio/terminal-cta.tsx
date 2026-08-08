@@ -6,10 +6,8 @@ const LINKS = {
   email: "mailto:yaskhalil2006@gmail.com",
   github: "https://github.com/yaskhalil",
   linkedin: "https://www.linkedin.com/in/yaseenkhalil/",
-  x: "https://x.com/yaskhalil2006",
   medium: "https://medium.com/@yaskhalil2006",
   substack: "https://yaseenkhalil.substack.com",
-  resume: "/resume.pdf",
 } as const
 
 type Command = keyof typeof LINKS | "help" | "status" | "clear"
@@ -21,12 +19,8 @@ const ALIASES: Record<string, Command> = {
   gh: "github",
   linkedin: "linkedin",
   in: "linkedin",
-  x: "x",
-  twitter: "x",
   medium: "medium",
   substack: "substack",
-  resume: "resume",
-  cv: "resume",
   help: "help",
   "?": "help",
   status: "status",
@@ -34,7 +28,7 @@ const ALIASES: Record<string, Command> = {
   ls: "help",
 }
 
-const HELP_TEXT = "Commands: email, github, linkedin, x, medium, substack, resume, status, clear"
+const HELP_TEXT = "Commands: email, github, linkedin, medium, substack, status, clear"
 
 type LogEntry = { cmd: string; output: string; kind: "ok" | "err" | "info" }
 
